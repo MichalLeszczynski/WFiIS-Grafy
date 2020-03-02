@@ -5,15 +5,18 @@ import random
 
 # Propozycja biblioteki do obsługi grafów
 
+
 def matrix2d(h, w):
     # zwraca macierz h x w wypełnioną zerami
     return [[0 for _ in range(w)] for _ in range(h)]
+
 
 def print2d(m):
     # "ładne" wypisanie macierzy 2d
     for l in m:
         # aby użyć funkcji 'join' zamieniamy int na str
-        print('\t'.join([str(n) for n in l]))
+        print("\t".join([str(n) for n in l]))
+
 
 class Graph:
     """Obiekt reprezentujący graf nieskierowany.
@@ -40,16 +43,16 @@ class Graph:
 
     def save(self, filename):
         print('zapisywanie grafu do pliku "{}"'.format(filename))
-        with open(filename, 'w') as f:
-            f.write('{}\n'.format(self.size))
+        with open(filename, "w") as f:
+            f.write("{}\n".format(self.size))
             for n1, n2 in self.edges():
-                f.write('{} {}\n'.format(n1, n2))
+                f.write("{} {}\n".format(n1, n2))
 
     def load(self, filename):
         print('ładowanie grafu z pliku "{}"'.format(filename))
         self.clear()
 
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             # pierwsza linia - liczba wierzchołków
             size = int(f.readline())
             self.create_nodes(size)
@@ -58,15 +61,16 @@ class Graph:
             for l in f:
                 l1, l2 = l.split(" ")
                 self.create_edge(int(l1), int(l2))
-    def save_dot(self, filename, engine='dot'):
+
+    def save_dot(self, filename, engine="dot"):
         # engine: http://www.graphviz.org/
         # dot, neato, circo
-        with open(filename, 'w') as f:
-            f.write('graph g {\n')
+        with open(filename, "w") as f:
+            f.write("graph g {\n")
             for n1, n2 in self.edges():
-                f.write('{} -- {}\n'.format(n1, n2))
-            f.write('}\n')
-        os.system('dot -Tpng -K{} -O {}'.format(engine, filename))
+                f.write("{} -- {}\n".format(n1, n2))
+            f.write("}\n")
+        os.system("dot -Tpng -K{} -O {}".format(engine, filename))
 
     def edges(self):
         # zbiór wszystkich istniejących krawędzi
@@ -103,6 +107,7 @@ class Graph:
             if n1 != n2 and not self.has_edge(n1, n2):
                 self.create_edge(n1, n2)
                 c += 1
+
     def connect_random(self, p):
         # łączy wierzchołki tak, aby prawdopodobieńswto istanienia krawędzi
         # między dowolnymi dwoma wierzchołkami wynosiło p

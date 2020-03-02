@@ -10,3 +10,8 @@ Nr projektu | Data
 4 | 2020-05-04
 5 | 2020-05-11
 6 | 2020-05-18
+
+# Wymagania
+```
+sudo apt install graphviz
+```

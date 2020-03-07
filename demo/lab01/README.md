@@ -15,4 +15,4 @@ danego kodowania na pozostałe.
 	- l - liczba krawędzi
 - G(n, p)
 	- n - liczba wierzchołków
-	- l - prawdopodobieńswto istnienia krawędzi (z prawdopodobieństwem *p* dokładamy krawędź przy iterowanie po każdej mozliwej krawędzi)
+	- p - prawdopodobieńswto istnienia krawędzi (z prawdopodobieństwem *p* dokładamy krawędź przy iterowanie po każdej mozliwej krawędzi)

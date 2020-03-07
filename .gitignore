@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# IDE's
+.vscode/
+
+# Output files
+*.png
+*.g
+*.gv

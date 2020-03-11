@@ -6,7 +6,8 @@ from .functions import is_valid_graph_sequence
 class GraphBuilder:
     """Tworzy różne rodzaje grafów"""
 
-    def get_eulerian_graph(self, size):
+    @staticmethod
+    def get_eulerian_graph(size):
         """Losowy graf Eulerowski"""
         while True:
             seq = []
@@ -23,7 +24,8 @@ class GraphBuilder:
             g.randomize(size)
         return g
 
-    def get_k_regular_graph(self, size, k, connected=False):
+    @staticmethod
+    def get_k_regular_graph(size, k, connected=False):
         """Graf z wierzchołkami o tym samym stopniu"""
         seq = [k for _ in range(size)]
         g = SimpleGraph().from_graph_sequence(seq)
@@ -34,4 +36,12 @@ class GraphBuilder:
                 if g.is_connected_graph():
                     break
                 g.randomize(size)
+        return g
+
+    @staticmethod
+    def get_random_graph(max_size=20):
+        """Losowy graf"""
+        size = random.randint(2, max_size)
+        g = SimpleGraph(size)
+        g.connect_random(random.random())
         return g

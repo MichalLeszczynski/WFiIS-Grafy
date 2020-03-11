@@ -1,3 +1,6 @@
+"""Pomocnicze funkcje które nie używają klasy SimpleGraph"""
+
+
 def is_valid_graph_sequence(seq):
     """Sprawdza czy z podanej listy da się utworzyć graf"""
     # Jeśli liczba wierzchołków o nieparzystym stopniu jest nieparzysta to nie jest to ciąg graficzny

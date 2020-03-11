@@ -6,7 +6,7 @@ sys.path.insert(0, "../..")
 from spacja.simple_graph import SimpleGraph
 from spacja.graph_builder import GraphBuilder
 from spacja.functions import is_valid_graph_sequence
-from spacja.algorithms import find_eulerian_trail
+from spacja.algorithms import find_eulerian_trail, find_hamiltonian_circuit
 
 # setup
 gb = GraphBuilder()
@@ -34,7 +34,7 @@ print("\n#4 Losowy graf Eulerowski")
 g = gb.get_eulerian_graph(size=8)
 print(g.graph_sequence())
 print(g)
-g.save(filename="euler", format="png")
+g.save(filename="euler", file_format="png")
 euler_path = find_eulerian_trail(g)
 print("Ścieżka Eulera")
 print(euler_path)
@@ -52,3 +52,15 @@ g.save("k6", "png")
 
 # 6
 print("\n#6 Grafy Hamiltonowskie")
+for i in range(100):
+    g = gb.get_random_graph(max_size=16)
+    try:
+        hamiltonian_circuit = find_hamiltonian_circuit(g)
+        print("Znaleziono cykl Hamiltona")
+        print(hamiltonian_circuit)
+        g.save("Hamilton_{}".format(i), "png")
+        break
+    except ValueError as e:
+        print(e)
+else:
+    print("Nie udało się wygenerować losowo żadnych poprawnych grafów Hamiltonowskich")

@@ -59,5 +59,5 @@ print(g.edges())
 
 # Rysowanie grafu
 # Dla małych grafów lub słabo połączonych nie rysuje dokładnego okręgu
-g.save("lab01_circo", format="png", engine="circo")
-g.save("lab01_dot", format="png", engine="dot")
+g.save("lab01_circo", file_format="png", engine="circo")
+g.save("lab01_dot", file_format="png", engine="dot")

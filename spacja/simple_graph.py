@@ -33,14 +33,14 @@ class SimpleGraph:
     def clear(self):
         self.g = {}
 
-    def save(self, filename, format="g", engine="circo"):
+    def save(self, filename, file_format="g", engine="circo"):
         """Zapisz graf w różnych formatach
             g - lista sąsiedztwa
             gv - dot format
             png - plik graficzny http://www.graphviz.org/
                 engine = dot, neato, circo ...
         """
-        if format == "g":
+        if file_format == "g":
             filename += ".g"
             print('Zapisywanie grafu do pliku "{}"'.format(filename))
             with open(filename, "w") as f:
@@ -48,7 +48,7 @@ class SimpleGraph:
                 for n1, n2 in self.edges():
                     f.write("{} {}\n".format(n1, n2))
 
-        elif format == "gv":
+        elif file_format == "gv":
             filename += ".gv"
             with open(filename, "w") as f:
                 f.write("graph g {\n")
@@ -56,8 +56,8 @@ class SimpleGraph:
                     f.write("{} -- {}\n".format(n1, n2))
                 f.write("}\n")
 
-        elif format == "png":
-            self.save(filename, format="gv")
+        elif file_format == "png":
+            self.save(filename, file_format="gv")
             os.system("dot -T png -K {} -O {}".format(engine, filename + ".gv"))
             os.system("rm {}".format(filename + ".gv"))
 
@@ -126,7 +126,7 @@ class SimpleGraph:
 
     def connect_random(self, p):
         """
-        Łączy wierzchołki tak, aby prawdopodobieńswto istanienia krawędzi
+        Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
         między dowolnymi dwoma wierzchołkami wynosiło p
         iteracja po każdej kombinacji bez powtórzeń 2 wierzchołków
         """
@@ -240,12 +240,8 @@ class SimpleGraph:
         """Losowo zamienia krawędzie: a-b c-d -> a-d b-c"""
         while n_switches > 0:
             edges = tuple(self.edges())
-            e1 = random.choice(edges)
-            e2 = random.choice(edges)
-            a = e1[0]
-            b = e1[1]
-            c = e2[0]
-            d = e2[1]
+            a, b = random.choice(edges)
+            c, d = random.choice(edges)
             if a == d or b == c:
                 continue
             if self.is_connected(a, d) or self.is_connected(b, c):
@@ -259,7 +255,7 @@ class SimpleGraph:
     def is_connected_graph(self):
         """Czy jest to graf spójny"""
         comp = self.components()
-        for k, v in comp.items():
+        for _, v in comp.items():
             if v != 1:
                 return False
         return True

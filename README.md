@@ -14,4 +14,6 @@ Nr projektu | Data
 # Wymagania
 ```
 sudo apt install graphviz
+sudo apt install python3-pytest
+pip3 install -r requirements.txt
 ```

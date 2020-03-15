@@ -1,7 +1,7 @@
 import random
 import pytest
-from .algorithms import *
-from .graph_builder import GraphBuilder
+from spacja.algorithms import *
+from spacja.graph_builder import GraphBuilder
 
 
 class TestAlgorithms:

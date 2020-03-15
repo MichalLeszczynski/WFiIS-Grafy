@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from .functions import *
+from spacja.functions import *
 
 
 def test_is_valid_graph_sequence():

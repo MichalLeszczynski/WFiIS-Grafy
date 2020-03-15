@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import pytest
-from .simple_graph import SimpleGraph
+from spacja.simple_graph import SimpleGraph
 
 
 class TestSimpleGraph:

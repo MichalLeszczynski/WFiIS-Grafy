@@ -1,7 +1,8 @@
 """Algorytmy działające na grafach"""
 import copy
 import random
-from .graphs import SimpleGraph, Node
+from .graph import Node
+from .simple_graph import SimpleGraph
 
 
 def find_eulerian_trail(g):

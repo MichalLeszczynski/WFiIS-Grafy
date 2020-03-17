@@ -4,7 +4,7 @@ import sys
 from pprint import pprint
 
 sys.path.insert(0, "../..")
-from spacja.graphs import SimpleGraph
+from spacja.simple_graph import SimpleGraph
 
 g = SimpleGraph(5)
 g.connect(1, 2)

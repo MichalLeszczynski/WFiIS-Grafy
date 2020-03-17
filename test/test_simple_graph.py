@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pytest
-from spacja.graphs import SimpleGraph, Node, Edge
+from spacja.graph import Node, Edge
+from spacja.simple_graph import SimpleGraph
 
 
 class TestSimpleGraph:

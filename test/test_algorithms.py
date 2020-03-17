@@ -2,7 +2,7 @@ import random
 import pytest
 from spacja.algorithms import *
 from spacja.graph_builder import GraphBuilder
-from spacja.graphs import Edge
+from spacja.graph import Edge
 from pprint import pprint
 
 

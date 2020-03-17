@@ -1,5 +1,5 @@
 import random
-from .graphs import SimpleGraph
+from .simple_graph import SimpleGraph
 from .functions import is_valid_graph_sequence
 
 

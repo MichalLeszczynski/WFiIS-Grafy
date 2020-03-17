@@ -3,7 +3,7 @@
 import sys
 
 sys.path.insert(0, "../..")
-from spacja.graphs import SimpleGraph
+from spacja.simple_graph import SimpleGraph
 from spacja.graph_builder import GraphBuilder
 from spacja.functions import is_valid_graph_sequence
 from spacja.algorithms import find_eulerian_trail, find_hamiltonian_circuit

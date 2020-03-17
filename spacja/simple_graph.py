@@ -79,11 +79,11 @@ class SimpleGraph:
     def edges(self):
         """Zbiór wszystkich istniejących krawędzi"""
         edges = set()
-        for n in self.g:
-            for m in self.g[n]:
+        for vertex in self.g:
+            for neighbour in self.g[vertex]:
                 # Graf nieskierowany, nie podajemy duplikatów
-                if n < m:
-                    edges.add((n, m))
+                if vertex < neighbour:
+                    edges.add((vertex, neighbour))
         return edges
 
     def add_nodes(self, count=1):
@@ -100,7 +100,7 @@ class SimpleGraph:
         self.g[node2].add(node1)
 
     def disconnect(self, node1, node2):
-        """Usuwa krawędż między wierchołkiem node1 a node2"""
+        """Usuwa krawędż między wierzchołkiem node1 a node2"""
         if node1 not in self.g or node2 not in self.g or node1 == node2:
             raise ValueError
 
@@ -255,7 +255,7 @@ class SimpleGraph:
     def is_connected_graph(self):
         """Czy jest to graf spójny"""
         comp = self.components()
-        for _, v in comp.items():
+        for v in comp.values():
             if v != 1:
                 return False
         return True

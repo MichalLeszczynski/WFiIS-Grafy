@@ -3,7 +3,7 @@
 import sys
 
 sys.path.insert(0, "../..")
-from spacja.simple_graph import SimpleGraph
+from spacja.graphs import SimpleGraph
 from spacja.graph_builder import GraphBuilder
 from spacja.functions import is_valid_graph_sequence
 from spacja.algorithms import find_eulerian_trail, find_hamiltonian_circuit
@@ -16,17 +16,17 @@ print("\n#1 Ciąg graficzny")
 print(is_valid_graph_sequence([4, 3, 3, 2, 2, 1, 1]))
 print(is_valid_graph_sequence([4, 3, 3, 2, 2, 1]))
 g = SimpleGraph()
-g.from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
+g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
 
 # 2
 print("\n#2 Randomizacja")
-print(g.edges())
+print(g.get_edges())
 g.randomize(100)
-print(g.edges())
+print(g.get_edges())
 
 # 3
 print("\n#3 Największa wspólna składowa")
-g.from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
+g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
 print(g.largest_component())
 
 # 4

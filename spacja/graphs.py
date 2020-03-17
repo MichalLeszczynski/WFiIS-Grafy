@@ -6,8 +6,8 @@ import os
 import random
 from typing import Set, Dict, List, Any, Union
 from dataclasses import dataclass
-import abc 
-from abc import ABC, abstractmethod 
+import abc
+from abc import ABC, abstractmethod
 
 from .functions import is_valid_graph_sequence  # type: ignore
 
@@ -41,7 +41,7 @@ class Edge:
     def __hash__(self) -> Any:
         return hash(str(self))
 
-    def sort(self): # tylko do grafów prostych!
+    def sort(self):  # tylko do grafów prostych!
         if self.begin.index > self.end.index:
             self.begin, self.end = self.end, self.begin
 
@@ -74,7 +74,7 @@ class Graph(ABC):
         self, node1: Union[Node, int], node2: Union[Node, int], weight: Weight = 1
     ) -> None:
         """Tworzy krawędż między wierzchołkiem node1 a node2"""
-    
+
     @abstractmethod
     def disconnect(self, node1: Union[Node, int], node2: Union[Node, int]) -> None:
         """Usuwa krawędż między wierzchołkiem node1 a node2"""
@@ -93,10 +93,12 @@ class Graph(ABC):
     def to_adjacency_list(self) -> AdjencyList:
         """Zwraca graf w postaci listy sąsiedztwa"""
         pass
+
     @abstractmethod
     def to_adjacency_matrix(self) -> AdjencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
         pass
+
     @abstractmethod
     def to_incidence_matrix(self) -> IncidenceMatrix:
         """Zwraca graf w postaci macierzy incydencji"""
@@ -274,15 +276,16 @@ class Graph(ABC):
 
 
 class SimpleGraph(Graph):
-
     def node_neighbours(self, node: Node) -> Set[Node]:
         """Returns Nodes adjecent to a given node """
         return set([edge.end for edge in self.node_edges(node)])
 
     def node_edges(self, node: Node) -> Set[Edge]:
         """Returns set of edges adjacent to the given node """
-        return set([edge for edge in self.get_all_possible_edges() if edge.begin == node])
-    
+        return set(
+            [edge for edge in self.get_all_possible_edges() if edge.begin == node]
+        )
+
     def node_degree(self, node: Node) -> int:
         """Returns degree of a selected node """
         return len(self.node_edges(node))

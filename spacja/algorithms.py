@@ -21,7 +21,7 @@ def find_eulerian_trail(g):
             next_vertex = random.choice(tuple(g.node_edges(current_vertex))).end
             g.disconnect(current_vertex, next_vertex)
             stack.append(next_vertex)
-    return solution        
+    return solution
 
 
 def find_hamiltonian_circuit(g):
@@ -46,7 +46,7 @@ def hamilton_search_r(g, stack):
             return None
     else:
         for neighbour in g.node_neighbours(stack[-1]):
-        # for neighbour in g.g[stack[-1]]:
+            # for neighbour in g.g[stack[-1]]:
             if neighbour in stack:
                 continue
             stack.append(neighbour)

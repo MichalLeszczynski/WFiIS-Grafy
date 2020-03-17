@@ -5,6 +5,7 @@ from spacja.graph_builder import GraphBuilder
 from spacja.graphs import Edge
 from pprint import pprint
 
+
 class TestAlgorithms:
     def setup_method(self):
         self.gb = GraphBuilder()
@@ -15,7 +16,7 @@ class TestAlgorithms:
         euler_trail = find_eulerian_trail(g)
         trail_edges = set()
         for i in range(len(euler_trail) - 1):
-            edge = Edge(euler_trail[i], euler_trail[i+1])
+            edge = Edge(euler_trail[i], euler_trail[i + 1])
             edge.sort()
             trail_edges.add(edge)
         for edge in edges:
@@ -29,4 +30,6 @@ class TestAlgorithms:
         for i in range(1, len(hamiltonian_circuit) - 1):
             assert g.is_connected(hamiltonian_circuit[i], hamiltonian_circuit[i + 1])
         # Sprawdź czy każdy wierzchołek (oprócz ostatniego) został odwiedzony dokładnie raz
-        assert sorted(hamiltonian_circuit, key=lambda x: x.index) == sorted(g.nodes, key=lambda x: x.index)
+        assert sorted(hamiltonian_circuit, key=lambda x: x.index) == sorted(
+            g.nodes, key=lambda x: x.index
+        )

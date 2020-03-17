@@ -27,7 +27,7 @@ class TestSimpleGraph:
         index_2 = 2
         n1 = Node(index_1)
         n2 = Node(index_2)
-        
+
         g.connect(n1, n2)
         assert g.is_connected(index_1, index_2)
         assert g.is_connected(n1, n2)
@@ -80,11 +80,9 @@ class TestSimpleGraph:
         g.disconnect(index_2, index_1)
         assert not g.is_connected(index_1, index_2)
         assert not g.is_connected(n1, n2)
- 
-
 
     def test_add_random_edges(self):
-        g = SimpleGraph(8) # max edges 28
+        g = SimpleGraph(8)  # max edges 28
         g.add_random_edges(8)
         assert len(g.edges) == 8
         g.add_random_edges(20)
@@ -135,7 +133,6 @@ class TestSimpleGraph:
 
         assert before == after
 
-        
     def test_components(self):
         g = SimpleGraph()
         g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1, 1])

@@ -24,7 +24,6 @@ class TestAlgorithms:
 
     def test_find_hamiltonian_circuit(self):
         g = self.gb.get_k_regular_graph(size=8, k=7)  # graf pełny
-        # vertices = [v for v, _ in g.g.items()]
         hamiltonian_circuit = find_hamiltonian_circuit(g)
         # Sprawdź czy krawędzie istnieją
         for i in range(1, len(hamiltonian_circuit) - 1):

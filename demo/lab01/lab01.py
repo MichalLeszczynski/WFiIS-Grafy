@@ -20,6 +20,7 @@ print(g.get_edges())
 
 print("\nZapis do pliku")
 g.save("lab01")
+g.save("lab01", file_format="gv")
 g.load("lab01.g")
 
 print(g)
@@ -62,6 +63,5 @@ print(g.get_edges())
 
 # Rysowanie grafu
 # Dla małych grafów lub słabo połączonych nie rysuje dokładnego okręgu
-g.save("lab01_circo", file_format="g", engine="circo")
 g.save("lab01_circo", file_format="png", engine="circo")
 g.save("lab01_dot", file_format="png", engine="dot")

@@ -250,7 +250,6 @@ class Graph(ABC):
     def randomize(self, n_switches: int) -> None:
         """Losowo zamienia krawędzie: a-b c-d -> a-d b-c"""
         while n_switches > 0:
-            # edges = tuple(self.edges)
             r1 = random.choice(tuple(self.edges))
             a, b = r1.begin, r1.end
             r2 = random.choice(tuple(self.edges))

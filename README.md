@@ -13,5 +13,7 @@ Nr projektu | Data
 
 # Wymagania
 ```
+python >= 3.7
 sudo apt install graphviz
+pip3 install -r requirements.txt
 ```

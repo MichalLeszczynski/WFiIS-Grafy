@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+from pprint import pprint
 
 sys.path.insert(0, "../..")
 from spacja.simple_graph import SimpleGraph
@@ -15,39 +16,42 @@ g.connect(5, 2)
 g.connect(2, 4)
 
 print(g)
-print(g.edges())
+print(g.get_edges())
 
 print("\nZapis do pliku")
 g.save("lab01")
+g.save("lab01", file_format="gv")
 g.load("lab01.g")
 
 print(g)
-print(g.edges())
+print(g.get_edges())
 
-print("\nMacierz sąsiedztwa")
+print("\nMacierz sąsiedztwa\n")
 
-print(g.adjacency_matrix())
-
-g.from_adjacency_matrix(g.adjacency_matrix())
+pprint(g.to_adjacency_matrix())
+print("\nPo konwersji:\n")
+g.fill_from_adjacency_matrix(g.to_adjacency_matrix())
 
 print(g)
-print(g.edges())
+print(g.get_edges())
 
 print("\nMacierz incydencji")
 
-print(g.incidence_matrix())
+pprint(g.to_incidence_matrix())
 
-g.from_incidence_matrix(g.incidence_matrix())
+print("\nPo konwersji:\n")
+
+g.fill_from_incidence_matrix(g.to_incidence_matrix())
 
 print(g)
-print(g.edges())
+print(g.get_edges())
 
 print("\nDodawanie losowych krawędzi")
 g = SimpleGraph(8)
-g.add_random_edges(5)
+g.add_random_edges(17)
 
 print(g)
-print(g.edges())
+print(g.get_edges())
 
 
 print("\nLosowe łączenie wierzchołków")
@@ -55,7 +59,7 @@ g = SimpleGraph(12)
 g.connect_random(0.5)
 
 print(g)
-print(g.edges())
+print(g.get_edges())
 
 # Rysowanie grafu
 # Dla małych grafów lub słabo połączonych nie rysuje dokładnego okręgu

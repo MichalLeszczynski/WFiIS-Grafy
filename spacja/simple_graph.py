@@ -1,192 +1,129 @@
-#!/usr/bin/env python3
+from __future__ import annotations
 
-import itertools
 import os
-import random
-import numpy as np
-from .functions import is_valid_graph_sequence
+from typing import Set, Union
+
+from spacja.graph import (
+    Graph,
+    Node,
+    Edge,
+    Weight,
+    AdjencyList,
+    AdjencyMatrix,
+    IncidenceMatrix,
+)
 
 
-class SimpleGraph:
-    """
-    Graf prosty, wewnętrznie reprezentowany jako lista sąsiedztwa.
-    Wierzchołki numerowane od 1 zgodnie z konwencją matematyczną.
-    """
+class SimpleGraph(Graph):
+    def get_all_possible_edges(self) -> Set[Edge]:
+        all_possible = set()
+        all_possible.update(self.edges)
+        all_possible.update(
+            [Edge(edge.end, edge.begin, edge.weight) for edge in self.edges]
+        )
+        return all_possible
 
-    def __init__(self, size=0):
-        # Tworzymy słownik, gdzie kluczem jest numer wierzchołka
-        # a wartością zbiór numerów wierzchołków, z którymi sąsiaduje
-        self.g = {}
+    def node_neighbours(self, node: Node) -> Set[Node]:
+        """Returns Nodes adjecent to a given node """
+        return set([edge.end for edge in self.node_edges(node)])
 
-        # Tworzymy zadaną liczbę wierzchołków
-        self.add_nodes(count=size)
+    def node_edges(self, node: Node) -> Set[Edge]:
+        """Returns set of edges adjacent to the given node """
+        return set(
+            [edge for edge in self.get_all_possible_edges() if edge.begin == node]
+        )
 
-    def __len__(self):
-        return len(self.g)
+    def node_degree(self, node: Node) -> int:
+        """Returns degree of a selected node """
+        return len(self.node_edges(node))
 
-    def __str__(self):
-        s = ""
-        for k, v in self.g.items():
-            s += "{}: {}\n".format(k, v)
-        return s
+    def connect(
+        self, node1: Union[Node, int], node2: Union[Node, int], weight: Weight = 1
+    ) -> None:
+        """Tworzy krawędż między wierzchołkiem node1 a node2"""
 
-    def clear(self):
-        self.g = {}
+        if isinstance(node1, int):
+            node1 = Node(node1)
+        if isinstance(node2, int):
+            node2 = Node(node2)
 
-    def save(self, filename, file_format="g", engine="circo"):
-        """Zapisz graf w różnych formatach
-            g - lista sąsiedztwa
-            gv - dot format
-            png - plik graficzny http://www.graphviz.org/
-                engine = dot, neato, circo ...
-        """
-        if file_format == "g":
-            filename += ".g"
-            print('Zapisywanie grafu do pliku "{}"'.format(filename))
-            with open(filename, "w") as f:
-                f.write("{}\n".format(len(self)))
-                for n1, n2 in self.edges():
-                    f.write("{} {}\n".format(n1, n2))
-
-        elif file_format == "gv":
-            filename += ".gv"
-            with open(filename, "w") as f:
-                f.write("graph g {\n")
-                for n1, n2 in self.edges():
-                    f.write("{} -- {}\n".format(n1, n2))
-                f.write("}\n")
-
-        elif file_format == "png":
-            self.save(filename, file_format="gv")
-            os.system("dot -T png -K {} -O {}".format(engine, filename + ".gv"))
-            os.system("rm {}".format(filename + ".gv"))
-
-    def load(self, filename):
-        """Wczytaj graf z pliku w formacie .g"""
-        print('Wczytywanie grafu z pliku "{}"'.format(filename))
-        self.clear()
-
-        with open(filename, "r") as f:
-            # Pierwsza linia - liczba wierzchołków
-            size = int(f.readline())
-            self.add_nodes(size)
-
-            # Pozostałe linie - krawędzie
-            for l in f:
-                l1, l2 = l.split(" ")
-                self.connect(int(l1), int(l2))
-
-    def edges(self):
-        """Zbiór wszystkich istniejących krawędzi"""
-        edges = set()
-        for n in self.g:
-            for m in self.g[n]:
-                # Graf nieskierowany, nie podajemy duplikatów
-                if n < m:
-                    edges.add((n, m))
-        return edges
-
-    def add_nodes(self, count=1):
-        """Tworzy nowe wierzchołki"""
-        for i in range(len(self) + 1, len(self) + 1 + count):
-            self.g[i] = set()
-
-    def connect(self, node1, node2):
-        """Tworzy krawędż między wierchołkiem node1 a node2"""
-        if node1 not in self.g or node2 not in self.g or node1 == node2:
+        if node1 not in self.nodes or node2 not in self.nodes:
             raise ValueError
 
-        self.g[node1].add(node2)
-        self.g[node2].add(node1)
+        if node1.index > node2.index:
+            node1, node2 = node2, node1
+        new_edge = Edge(node1, node2, weight)
 
-    def disconnect(self, node1, node2):
-        """Usuwa krawędż między wierchołkiem node1 a node2"""
-        if node1 not in self.g or node2 not in self.g or node1 == node2:
+        self.edges.add(new_edge)
+
+    def disconnect(self, node1: Union[Node, int], node2: Union[Node, int]) -> None:
+        """Usuwa krawędż między wierzchołkiem node1 a node2"""
+        if isinstance(node1, int):
+            node1 = Node(node1)
+        if isinstance(node2, int):
+            node2 = Node(node2)
+
+        if node1 not in self.nodes or node2 not in self.nodes or node1 == node2:
             raise ValueError
 
-        self.g[node1].remove(node2)
-        self.g[node2].remove(node1)
+        edges_to_be_deleted = [
+            edge for edge in self.edges if node1 == edge.begin and node2 == edge.end
+        ] + [edge for edge in self.edges if node1 == edge.end and node2 == edge.begin]
 
-    def add_random_edges(self, count=1):
-        """Tworzy określoną ilość losowych krawędzi"""
-        if len(self.edges()) + count > len(self) * (len(self) - 1) / 2:
-            raise ValueError(
-                "Zbyt duża liczba krawędzi dla grafu prostego o {} wierzchołkach".format(
-                    len(self)
+        edge_to_be_deleted = edges_to_be_deleted[0]
+        self.edges.remove(edge_to_be_deleted)
+
+    def is_connected(self, node1: Union[Node, int], node2: Union[Node, int]) -> bool:
+        """Czy stnieje krawędź node1 -- node2"""
+        if isinstance(node1, int):
+            node1 = Node(node1)
+        if isinstance(node2, int):
+            node2 = Node(node2)
+        return node2 in [
+            edge.end for edge in self.get_all_possible_edges() if edge.begin == node1
+        ]
+
+    def to_adjacency_list(self) -> AdjencyList:
+        """Zwraca graf w postaci listy sąsiedztwa"""
+        adj_l = {
+            (node.index): (
+                set(
+                    [
+                        edge.end.index
+                        for edge in self.get_all_possible_edges()
+                        if edge.begin == node
+                    ]
                 )
             )
-        c = 0
-        while c < count:
-            n1 = random.randint(1, len(self))
-            n2 = random.randint(1, len(self))
+            for node in self.nodes
+        }
+        return adj_l
 
-            if n1 != n2 and not self.is_connected(n1, n2):
-                self.connect(n1, n2)
-                c += 1
-
-    def connect_random(self, p):
-        """
-        Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
-        między dowolnymi dwoma wierzchołkami wynosiło p
-        iteracja po każdej kombinacji bez powtórzeń 2 wierzchołków
-        """
-        for n1, n2 in itertools.combinations(self.g.keys(), 2):
-            if random.random() < p:
-                self.connect(n1, n2)
-
-    def is_connected(self, node1, node2):
-        """Czy stnieje krawędź node1 -- node2"""
-        return node2 in self.g[node1]
-
-    def adjacency_matrix(self):
+    def to_adjacency_matrix(self) -> AdjencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
-        adj_m = np.zeros(shape=(len(self), len(self)))
-        for n1, n2 in self.edges():
-            adj_m[n1 - 1][n2 - 1] = 1
-            adj_m[n2 - 1][n1 - 1] = 1
+        adj_m = [[0 for _ in range(len(self))] for _ in range(len(self))]
+        for edge in self.edges:
+            n1 = edge.begin.index
+            n2 = edge.end.index
+
+            adj_m[n1 - 1][n2 - 1] = edge.weight
+            adj_m[n2 - 1][n1 - 1] = edge.weight
+
         return adj_m
 
-    def incidence_matrix(self):
+    def to_incidence_matrix(self) -> IncidenceMatrix:
         """Zwraca graf w postaci macierzy incydencji"""
-        edges = self.edges()
-        inc_m = np.zeros(shape=(len(self), len(edges)))
+        inc_m = [[0 for _ in range(len(self.edges))] for _ in range(len(self))]
+        for i, edge in enumerate(self.edges):
+            n1 = edge.begin.index
+            n2 = edge.end.index
 
-        for i, (n1, n2) in enumerate(edges):
-            inc_m[n1 - 1][i] = 1
-            inc_m[n2 - 1][i] = 1
+            inc_m[n1 - 1][i] = edge.weight
+            inc_m[n2 - 1][i] = edge.weight
+
         return inc_m
 
-    def graph_sequence(self):
-        """Zwraca ciąg graficzny"""
-        return [len(v) for v in self.g.values()]
-
-    def components(self):
-        """Zwraca słownik złożony z wierzchołków i spójnych składowych do których należą"""
-        nr = 0  # nr spójnej składowej
-        comp = {v: -1 for v in self.g}
-        for v in self.g:
-            if comp[v] == -1:
-                nr += 1
-                comp[v] = nr
-                self.components_r(nr, v, comp)
-        return comp
-
-    def components_r(self, nr, v, comp):
-        """Rekursywne przeszukiwanie wgłąb"""
-        for u in self.g[v]:
-            if comp[u] == -1:
-                comp[u] = nr
-                self.components_r(nr, u, comp)
-
-    def largest_component(self):
-        """Zwraca największą spójną składową"""
-        comp = self.components()
-        comp_list = [[] for _ in range(max(comp.values()))]
-        for v, c in comp.items():
-            comp_list[c - 1].append(v)
-        return max(comp_list, key=len)
-
-    def from_adjacency_matrix(self, adj_m):
+    def fill_from_adjacency_matrix(self, adj_m: AdjencyMatrix) -> SimpleGraph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
         self.clear()
 
@@ -195,77 +132,70 @@ class SimpleGraph:
 
         for n1 in range(len(self)):
             for n2 in range(len(self)):
-                # patrzymy tylko na elementy pod przekątną
                 if n1 < n2 and adj_m[n1][n2]:
                     # mapowanie numerów wierzchołków: n-1 -> n
-                    self.connect(n1 + 1, n2 + 1)
+                    self.connect(n1 + 1, n2 + 1, weight=adj_m[n1][n2])
         return self
 
-    def from_incidence_matrix(self, inc_m):
+    def fill_from_incidence_matrix(self, inc_m: IncidenceMatrix) -> SimpleGraph:
         """Wypełnianie grafu z macierzy incydencji"""
         self.clear()
 
-        size = len(inc_m)
-        self.add_nodes(size)
+        nodes_count = len(inc_m)
+        self.add_nodes(nodes_count)
 
-        for i in range(len(inc_m[0])):
-            edge = []
-            for n in range(len(self)):
-                # szukamy 1 w kolumnie
+        edges_count = len(inc_m[0])
+        for i in range(edges_count):  # il. krawedzi
+            edge_nodes = []
+            weight = 0
+            for n in range(nodes_count):
+                # szukamy niezerowej wartosci w kolumnie
                 if inc_m[n][i]:
-                    edge.append(n)
+                    edge_nodes.append(n)
+                    weight = inc_m[n][i]
             # mapowanie numerów wierzchołków: n-1 -> n
-            self.connect(edge[0] + 1, edge[1] + 1)
+            self.connect(
+                Node(edge_nodes[0] + 1), Node(edge_nodes[1] + 1), weight=weight
+            )
         return self
 
-    def from_graph_sequence(self, seq):
-        """Tworzenie grafu z ciągu graficznego"""
-        if is_valid_graph_sequence(seq):
-            self.__init__(len(seq))
-            degree_list = [[v + 1, d] for v, d in enumerate(seq)]
-            while True:
-                degree_list.sort(key=lambda x: x[1], reverse=True)
-                degree_list = [[v, d] for v, d in degree_list if d != 0]
-                if len(degree_list) == 0:
-                    break
-                for i in range(1, degree_list[0][1] + 1):
-                    self.connect(degree_list[0][0], degree_list[i][0])
-                    degree_list[0][1] -= 1
-                    degree_list[i][1] -= 1
-            return self
-        else:
-            raise ValueError("Niepoprawny ciąg graficzny")
+    def save(
+        self, filename: str, file_format: str = "g", engine: str = "circo"
+    ) -> None:
+        """Zapisz graf w różnych formatach
+            g - lista sąsiedztwa
+            gv - dot format
+            png - plik graficzny http://www.graphviz.org/
+                engine = dot, neato, circo ...
+        """
+        if file_format == "g":
+            filename += ".g"
+            print(f'Zapisywanie grafu do pliku "{filename}"')
+            with open(filename, "w") as f:
+                f.write(f"{len(self)}\n")
+                for edge in self.edges:
+                    n1 = edge.begin.index
+                    n2 = edge.end.index
+                    f.write(f"{n1} {n2}\n")
 
-    def randomize(self, n_switches):
-        """Losowo zamienia krawędzie: a-b c-d -> a-d b-c"""
-        while n_switches > 0:
-            edges = tuple(self.edges())
-            a, b = random.choice(edges)
-            c, d = random.choice(edges)
-            if a == d or b == c:
-                continue
-            if self.is_connected(a, d) or self.is_connected(b, c):
-                continue
-            self.disconnect(a, b)
-            self.disconnect(c, d)
-            self.connect(a, d)
-            self.connect(b, c)
-            n_switches -= 1
+        elif file_format == "gv":
+            with open(f"{filename}.{file_format}", "w") as f:
+                f.write("graph g {\n")
+                for edge in self.edges:
+                    n1 = edge.begin.index
+                    n2 = edge.end.index
+                    f.write(f"{n1} -- {n2}\n")
+                connected_nodes = [edge.begin for edge in self.get_all_possible_edges()]
+                not_connected_nodes = [
+                    node for node in self.nodes if node not in connected_nodes
+                ]
+                for node in not_connected_nodes:
+                    f.write(f"{node.index}\n")
 
-    def is_connected_graph(self):
-        """Czy jest to graf spójny"""
-        comp = self.components()
-        for _, v in comp.items():
-            if v != 1:
-                return False
-        return True
+                f.write("}\n")
 
-    def is_eulerian(self):
-        """Czy jest to graf Eulerowski"""
-        if self.is_connected_graph():
-            for d in self.graph_sequence():
-                if d % 2 == 1:
-                    return False
-            return True
-        else:
-            return False
+        elif file_format == "png":
+            self.save(filename, file_format="gv")
+            filename += ".gv"
+            os.system(f"dot -T png -K {engine} -O {filename}")
+            os.system(f"rm {filename}")

@@ -72,10 +72,6 @@ class Graph(ABC):
             s += f"{k}: {v}\n"
         return s
 
-    def get_edges(self) -> str:
-        l = [f"{edge.begin} -> {edge.end} w:{edge.weight}\n" for edge in self.edges]
-        return "".join(l)
-
     def clear(self) -> None:
         self.nodes.clear()
         self.edges.clear()

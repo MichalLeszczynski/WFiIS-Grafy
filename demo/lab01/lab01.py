@@ -16,7 +16,7 @@ g.connect(5, 2)
 g.connect(2, 4)
 
 print(g)
-print(g.get_edges())
+print(g.edges)
 
 print("\nZapis do pliku")
 g.save("lab01")
@@ -24,7 +24,7 @@ g.save("lab01", file_format="gv")
 g.load("lab01.g")
 
 print(g)
-print(g.get_edges())
+print(g.edges)
 
 print("\nMacierz sąsiedztwa\n")
 
@@ -33,7 +33,7 @@ print("\nPo konwersji:\n")
 g.fill_from_adjacency_matrix(g.to_adjacency_matrix())
 
 print(g)
-print(g.get_edges())
+pprint(g.edges)
 
 print("\nMacierz incydencji")
 
@@ -44,14 +44,14 @@ print("\nPo konwersji:\n")
 g.fill_from_incidence_matrix(g.to_incidence_matrix())
 
 print(g)
-print(g.get_edges())
+pprint(g.edges)
 
 print("\nDodawanie losowych krawędzi")
 g = SimpleGraph(8)
 g.add_random_edges(17)
 
 print(g)
-print(g.get_edges())
+pprint(g.edges)
 
 
 print("\nLosowe łączenie wierzchołków")
@@ -59,7 +59,7 @@ g = SimpleGraph(12)
 g.connect_random(0.5)
 
 print(g)
-print(g.get_edges())
+pprint(g.edges)
 
 # Rysowanie grafu
 # Dla małych grafów lub słabo połączonych nie rysuje dokładnego okręgu

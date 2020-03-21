@@ -11,7 +11,7 @@ from spacja.algorithms import find_shortest_path_dijkstra
 # 1 
 g = gb.get_random_weighted_connected_graph(8)
 print(g)
-print(g.get_edges())
+pprint(g.edges)
 
 # 2 
 print("Dijkstra:")

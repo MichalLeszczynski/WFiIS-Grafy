@@ -1,7 +1,8 @@
 """Algorytmy działające na grafach"""
 import copy
 import random
-from typing import List
+from typing import List, Tuple, Dict
+from heapq import heappush, heappop
 from .graph import Node
 from .simple_graph import SimpleGraph
 
@@ -54,3 +55,40 @@ def hamilton_search_r(g, stack) -> List[Node]:
             if hamilton_search_r(g, stack):
                 return stack
     raise ValueError("Nie jest to graf Hamiltonowski\n{}".format(g))
+
+
+def find_shortest_path_dijkstra(g: SimpleGraph, source: Node) -> Tuple[Dict[Node, int], Dict[Node, Node]]:
+    """ Przyjmuje graf i zrodlo (wierzcholek).
+        Zwraca:
+        - slownik odleglosci od zrodla
+        - slownik poprzednikow 
+    """
+    g = copy.deepcopy(g)
+
+    for node in g.nodes:
+        node.is_visited = False
+
+    # kolejka priorytetowa dla wierzchołkow grafu (klucz: aktualnie wyliczona odleglosc)
+    Q = []
+    for node in g.nodes:
+        node.distance_from_source = float("inf")
+        node.predecessor = None
+        Q.append(node)
+    source.distance_from_source = 0
+    Q_priority = lambda n: n.distance_from_source
+
+    while Q:
+        Q.sort(key=Q_priority)
+        u = Q.pop(0)
+        for v in g.node_neighbours(u):
+            if v in Q:
+                new_distance = u.distance_from_source + g.edge_to_node(u, v).weight
+                old_distance = v.distance_from_source
+                if new_distance < old_distance:
+                    v.distance_from_source = new_distance
+                    v.predecessor = u
+
+    d = {node:node.distance_from_source for node in g.nodes}
+    p = {node:node.predecessor for node in g.nodes}
+
+    return (d, p)

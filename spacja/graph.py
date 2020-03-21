@@ -25,6 +25,9 @@ class Node:
     def __hash__(self) -> Any:
         return hash(str(self))
 
+    def __repr__(self):
+        return self.__str__()
+
 
 @dataclass
 class Edge:
@@ -38,6 +41,9 @@ class Edge:
 
     def __hash__(self) -> Any:
         return hash(str(self))
+    
+    def __repr__(self):
+        return self.__str__()
 
     def sort(self) -> None:  # tylko do grafów prostych!
         if self.begin.index > self.end.index:
@@ -281,3 +287,7 @@ class Graph(ABC):
             return True
         else:
             return False
+
+    def give_random_weights(self, max_weight=10):
+        for edge in self.edges:
+            edge.weight = random.randint(1, max_weight)

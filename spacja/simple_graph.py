@@ -37,6 +37,11 @@ class SimpleGraph(Graph):
         """Returns degree of a selected node """
         return len(self.node_edges(node))
 
+    def edge_to_node(self, begin: Node, end: Node) -> Edge:
+        """Get edge that connects given two nodes """
+        edge = [e for e in self.get_all_possible_edges() if e.begin == begin and e.end == end][0]
+        return edge
+
     def connect(
         self, node1: Union[Node, int], node2: Union[Node, int], weight: Weight = 1
     ) -> None:

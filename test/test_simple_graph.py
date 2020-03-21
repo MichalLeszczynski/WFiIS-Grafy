@@ -82,6 +82,15 @@ class TestSimpleGraph:
         assert not g.is_connected(index_1, index_2)
         assert not g.is_connected(n1, n2)
 
+    def test_is_connected_graph(self):
+        g = SimpleGraph(4)
+        g.connect(1, 2)
+        g.connect(3, 4)
+        assert not g.is_connected_graph()
+
+        g.connect(2, 3)
+        assert g.is_connected_graph()
+
     def test_add_random_edges(self):
         g = SimpleGraph(8)  # max edges 28
         g.add_random_edges(8)

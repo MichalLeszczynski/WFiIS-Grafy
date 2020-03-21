@@ -1,5 +1,6 @@
 """Pomocnicze funkcje które nie używają klasy SimpleGraph"""
-
+from typing import List, Dict
+from spacja.graph import Node
 
 def is_valid_graph_sequence(seq):
     """Sprawdza czy z podanej listy da się utworzyć graf"""
@@ -31,3 +32,13 @@ def is_valid_graph_sequence(seq):
             seq[i] -= 1
         del seq[0]
     return True
+
+def get_all_trails_from_predecessors(predecessors: Dict[Node, Node]) -> Dict[Node, List[Node]]:
+    trails = {}
+    for node in predecessors.keys():
+        trails[node] = get_trail_to_node(predecessors, node)
+
+def get_trail_to_node(predecessors: Dict[Node, Node], node: Node) -> List[Node]:
+    if predecessors[node] is None:
+        return [node]
+    return get_trail_to_node(predecessors, predecessors[node]) + node

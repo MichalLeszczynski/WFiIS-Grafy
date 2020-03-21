@@ -1,6 +1,6 @@
 import random
-from .simple_graph import SimpleGraph
-from .functions import is_valid_graph_sequence
+from spacja.simple_graph import SimpleGraph
+from spacja.functions import is_valid_graph_sequence
 
 
 class GraphBuilder:

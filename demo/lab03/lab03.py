@@ -18,6 +18,7 @@ from spacja.functions import get_all_trails_from_predecessors
 
 # 1
 print("\n\n***** 1 *****")
+
 g = gb.get_random_weighted_connected_graph(8)
 print(g)
 pprint(g.edges)
@@ -43,7 +44,7 @@ distances_matrix = get_distances_to_nodes_matrix(g)
 for l in distances_matrix:
     print(*l, sep="\t")
 
-
+pprint(g.to_adjacency_matrix())
 # 4
 print("\n\n***** 4 *****")
 

@@ -67,52 +67,32 @@ def find_shortest_path_dijkstra(
 
     for node in g.nodes:
         node.is_visited = False
-
+    distance = {}
     # kolejka priorytetowa dla wierzchołkow grafu (klucz: aktualnie wyliczona odleglosc)
     Q = []
+    # setattr(Node, "distance_from_source", float("inf"))
     for node in g.nodes:
-        node.distance_from_source = float("inf")
+        distance[node.index] = float("inf")
         node.predecessor = None
         Q.append(node)
-    source.distance_from_source = 0
-    Q_priority = lambda n: n.distance_from_source
+    distance[source.index] = 0
+    Q_priority = lambda n: distance[n.index]
 
     while Q:
         Q.sort(key=Q_priority)
         u = Q.pop(0)
         for v in g.node_neighbours(u):
             if v in Q:
-                new_distance = u.distance_from_source + g.edge_to_node(u, v).weight
-                old_distance = v.distance_from_source
+                new_distance = distance[u.index] + g.edge_to_node(u, v).weight
+                old_distance = distance[v.index]
                 if new_distance < old_distance:
-                    v.distance_from_source = new_distance
+                    distance[v.index] = new_distance
                     v.predecessor = u
 
-    d = {node: node.distance_from_source for node in g.nodes}
+    d = {node: distance[node.index] for node in g.nodes}
     p = {node: node.predecessor for node in g.nodes}
 
     return (d, p)
-
-
-def get_minimal_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
-    """ Przyjmuje graf
-        Zwraca jego minimalne drzewo rozpinające
-        Korzysta z algorytmu kruskala
-    """
-    # minimal spannig tree
-    mst = SimpleGraph(len(g))
-    Q = []
-    for edge in g.edges:
-        Q.append(edge)
-    Q_priority = lambda e: e.weight
-
-    while Q and not mst.is_connected_graph():
-        Q.sort(key=Q_priority)
-        current_edge = Q.pop(0)
-        comps = mst.components()
-        if comps[current_edge.begin.index] != comps[current_edge.end.index]:
-            mst.edges.add(current_edge)
-    return mst
 
 def get_distances_to_nodes_matrix(g: SimpleGraph) -> Matrix:
     distances_matrix = [[0 for _ in g.nodes] for _ in g.nodes]
@@ -138,3 +118,23 @@ def get_minimax_graph_center(g: SimpleGraph) -> Node:
     ]
     minimax_graph_center = Node(max_distances.index(min(max_distances)) + 1)
     return minimax_graph_center
+
+def get_minimal_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
+    """ Przyjmuje graf
+        Zwraca jego minimalne drzewo rozpinające
+        Korzysta z algorytmu kruskala
+    """
+    # minimal spannig tree
+    mst = SimpleGraph(len(g))
+    Q = []
+    for edge in g.edges:
+        Q.append(edge)
+    Q_priority = lambda e: e.weight
+
+    while Q and not mst.is_connected_graph():
+        Q.sort(key=Q_priority)
+        current_edge = Q.pop(0)
+        comps = mst.components()
+        if comps[current_edge.begin.index] != comps[current_edge.end.index]:
+            mst.edges.add(current_edge)
+    return mst

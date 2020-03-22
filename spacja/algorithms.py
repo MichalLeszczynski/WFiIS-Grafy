@@ -45,7 +45,7 @@ def hamilton_search_r(g, stack) -> List[Node]:
             return stack
         else:
             stack.pop
-            return None
+            return []
     else:
         for neighbour in g.node_neighbours(stack[-1]):
             if neighbour in stack:
@@ -56,7 +56,9 @@ def hamilton_search_r(g, stack) -> List[Node]:
     raise ValueError("Nie jest to graf Hamiltonowski\n{}".format(g))
 
 
-def find_shortest_path_dijkstra(g: SimpleGraph, source: Node) -> Tuple[Dict[Node, int], Dict[Node, Node]]:
+def find_shortest_path_dijkstra(
+    g: SimpleGraph, source: Node
+) -> Tuple[Dict[Node, int], Dict[Node, Node]]:
     """ Przyjmuje graf i zrodlo (wierzcholek).
         Zwraca:
         - slownik odleglosci od zrodla
@@ -86,10 +88,11 @@ def find_shortest_path_dijkstra(g: SimpleGraph, source: Node) -> Tuple[Dict[Node
                     v.distance_from_source = new_distance
                     v.predecessor = u
 
-    d = {node:node.distance_from_source for node in g.nodes}
-    p = {node:node.predecessor for node in g.nodes}
+    d = {node: node.distance_from_source for node in g.nodes}
+    p = {node: node.predecessor for node in g.nodes}
 
     return (d, p)
+
 
 def get_minimal_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
     """ Przyjmuje graf

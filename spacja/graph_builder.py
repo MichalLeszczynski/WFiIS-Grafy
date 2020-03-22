@@ -45,7 +45,7 @@ class GraphBuilder:
         g = SimpleGraph(size)
         g.connect_random(random.random())
         return g
-    
+
     @staticmethod
     def get_random_connected_graph(max_size=20):
         """Losowy graf spojny"""

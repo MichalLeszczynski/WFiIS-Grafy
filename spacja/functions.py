@@ -2,6 +2,7 @@
 from typing import List, Dict
 from spacja.helper_structures import Node
 
+
 def is_valid_graph_sequence(seq):
     """Sprawdza czy z podanej listy da się utworzyć graf"""
     # Jeśli liczba wierzchołków o nieparzystym stopniu jest nieparzysta to nie jest to ciąg graficzny
@@ -33,11 +34,15 @@ def is_valid_graph_sequence(seq):
         del seq[0]
     return True
 
-def get_all_trails_from_predecessors(predecessors: Dict[Node, Node]) -> Dict[Node, List[Node]]:
+
+def get_all_trails_from_predecessors(
+    predecessors: Dict[Node, Node]
+) -> Dict[Node, List[Node]]:
     trails = {}
     for node in predecessors.keys():
         trails[node] = get_trail_to_node(predecessors, node)
     return trails
+
 
 def get_trail_to_node(predecessors: Dict[Node, Node], node: Node) -> List[Node]:
     if predecessors[node] is None:

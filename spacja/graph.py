@@ -14,7 +14,6 @@ IncidenceMatrix = List[List[int]]
 
 
 class Graph(ABC):
-
     def __init__(self, size=0) -> None:
         self.nodes: Set[Node] = set()
         self.edges: Set[Edge] = set()

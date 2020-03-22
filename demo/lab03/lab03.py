@@ -9,6 +9,9 @@ from spacja.simple_graph import SimpleGraph
 from spacja.graph_builder import GraphBuilder as gb
 from spacja.algorithms import (
     find_shortest_path_dijkstra,
+    get_distances_to_nodes_matrix,
+    get_graph_center,
+    get_minimax_graph_center,
     get_minimal_spanning_tree_kruskal,
 )
 from spacja.functions import get_all_trails_from_predecessors
@@ -36,13 +39,7 @@ pprint(get_all_trails_from_predecessors(predecessors))
 print("\n\n***** 3 *****")
 
 print("\nMacierz odleglosci:")
-distances_matrix = [[0 for _ in g.nodes] for _ in g.nodes]
-
-for node in g.nodes:
-    distances, _ = find_shortest_path_dijkstra(g, node)
-    for to_node, distance in distances.items():
-        distances_matrix[node.index - 1][to_node.index - 1] = distance
-
+distances_matrix = get_distances_to_nodes_matrix(g)
 for l in distances_matrix:
     print(*l, sep="\t")
 
@@ -50,22 +47,12 @@ for l in distances_matrix:
 # 4
 print("\n\n***** 4 *****")
 
-print("\nSumy odleglosci:")
-summary_distances = [
-    sum(distances_from_node) for distances_from_node in distances_matrix
-]
-pprint(summary_distances)
-graph_center = summary_distances.index(min(summary_distances))
 print(
-    f"Centrum grafu: {graph_center + 1}, suma odleglosci: {summary_distances[graph_center]}"
+    f"\nCentrum grafu: {get_graph_center(g).index}"
 )
 
-print("\nMaksymalne odleglosci od wierzcholkow:")
-max_distances = [max(distances_from_node) for distances_from_node in distances_matrix]
-pprint(max_distances)
-graph_center = max_distances.index(min(max_distances))
 print(
-    f"Minimaxowe centrum grafu: {graph_center + 1}, minimalna odleglosc: {max_distances[graph_center]}"
+    f"\nMinimaxowe centrum grafu: {get_minimax_graph_center(g).index}"
 )
 
 

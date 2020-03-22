@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List
 
 
 Weight = int
-
+Matrix = List[List[int]]
 
 @dataclass
 class Node:

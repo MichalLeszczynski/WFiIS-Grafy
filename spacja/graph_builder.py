@@ -1,6 +1,6 @@
 import random
-from .simple_graph import SimpleGraph
-from .functions import is_valid_graph_sequence
+from spacja.simple_graph import SimpleGraph
+from spacja.functions import is_valid_graph_sequence
 
 
 class GraphBuilder:
@@ -44,4 +44,26 @@ class GraphBuilder:
         size = random.randint(2, max_size)
         g = SimpleGraph(size)
         g.connect_random(random.random())
+        return g
+
+    @staticmethod
+    def get_random_connected_graph(max_size=20):
+        """Losowy graf spojny"""
+        g = GraphBuilder.get_random_graph(max_size)
+        while not g.is_connected_graph():
+            g = GraphBuilder.get_random_graph(max_size)
+        return g
+
+    @staticmethod
+    def get_random_weighted_graph(max_size=20):
+        """Losowy graf"""
+        g = GraphBuilder.get_random_graph(max_size)
+        g.give_random_weights()
+        return g
+
+    @staticmethod
+    def get_random_weighted_connected_graph(max_size=20):
+        """Losowy graf"""
+        g = GraphBuilder.get_random_connected_graph(max_size)
+        g.give_random_weights()
         return g

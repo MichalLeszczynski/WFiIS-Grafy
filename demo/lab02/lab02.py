@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+from pprint import pprint
 
 sys.path.insert(0, "../..")
 from spacja.simple_graph import SimpleGraph
@@ -20,9 +21,9 @@ g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
 
 # 2
 print("\n#2 Randomizacja")
-print(g.get_edges())
+pprint(g.edges)
 g.randomize(100)
-print(g.get_edges())
+pprint(g.edges)
 
 # 3
 print("\n#3 Największa wspólna składowa")

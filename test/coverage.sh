@@ -2,5 +2,5 @@
 
 # Generate code & branch coverage report
 coverage run --source=../ --branch -m pytest
-coverage html --skip-empty
+coverage html
 google-chrome htmlcov/index.html &

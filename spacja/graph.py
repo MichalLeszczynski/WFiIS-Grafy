@@ -4,51 +4,19 @@ from __future__ import annotations
 import itertools
 import random
 from typing import Set, Dict, List, Any, Union
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
-
+from spacja.helper_structures import Node, Edge, Weight
 from spacja.functions import is_valid_graph_sequence  # type: ignore
 
-Weight = int
 AdjencyList = Dict[int, Set[int]]
 AdjencyMatrix = List[List[int]]
 IncidenceMatrix = List[List[int]]
 
 
-@dataclass
-class Node:
-    index: int = 0
-
-    def __str__(self) -> str:
-        return str(self.index)
-
-    def __hash__(self) -> Any:
-        return hash(str(self))
-
-
-@dataclass
-class Edge:
-    begin: Node
-    end: Node
-    weight: Weight = 1
-
-    def __str__(self) -> str:
-        s = f"{self.begin} -> {self.end} w: {self.weight}"
-        return s
-
-    def __hash__(self) -> Any:
-        return hash(str(self))
-
-    def sort(self) -> None:  # tylko do grafów prostych!
-        if self.begin.index > self.end.index:
-            self.begin, self.end = self.end, self.begin
-
-
 class Graph(ABC):
-    nodes: Set[Node] = set()
-    edges: Set[Edge] = set()
-
     def __init__(self, size=0) -> None:
+        self.nodes: Set[Node] = set()
+        self.edges: Set[Edge] = set()
         self.clear()
         self.add_nodes(count=size)
 
@@ -65,10 +33,6 @@ class Graph(ABC):
         for k, v in self.to_adjacency_list().items():
             s += f"{k}: {v}\n"
         return s
-
-    def get_edges(self) -> str:
-        l = [f"{edge.begin} -> {edge.end} w:{edge.weight}\n" for edge in self.edges]
-        return "".join(l)
 
     def clear(self) -> None:
         self.nodes.clear()
@@ -281,3 +245,7 @@ class Graph(ABC):
             return True
         else:
             return False
+
+    def give_random_weights(self, max_weight=10):
+        for edge in self.edges:
+            edge.weight = random.randint(1, max_weight)

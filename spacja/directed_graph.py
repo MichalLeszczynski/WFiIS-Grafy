@@ -14,18 +14,13 @@ from spacja.graph import (
 )
 
 
-class SimpleGraph(Graph):
+class DirectedGraph(Graph):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.separator = "--"
+        self.separator = "->"
 
     def get_all_possible_edges(self) -> Set[Edge]:
-        all_possible = set()
-        all_possible.update(self.edges)
-        all_possible.update(
-            [Edge(edge.end, edge.begin, edge.weight) for edge in self.edges]
-        )
-        return all_possible
+        return self.edges
 
     def connect(
         self, node1: Union[Node, int], node2: Union[Node, int], weight: Weight = 1
@@ -40,8 +35,6 @@ class SimpleGraph(Graph):
         if node1 not in self.nodes or node2 not in self.nodes:
             raise ValueError
 
-        if node1.index > node2.index:
-            node1, node2 = node2, node1
         new_edge = Edge(node1, node2, weight)
 
         self.edges.add(new_edge)
@@ -58,8 +51,7 @@ class SimpleGraph(Graph):
 
         edges_to_be_deleted = [
             edge for edge in self.edges if node1 == edge.begin and node2 == edge.end
-        ] + [edge for edge in self.edges if node1 == edge.end and node2 == edge.begin]
-
+        ]
         edge_to_be_deleted = edges_to_be_deleted[0]
         self.edges.remove(edge_to_be_deleted)
 
@@ -69,9 +61,7 @@ class SimpleGraph(Graph):
             node1 = Node(node1)
         if isinstance(node2, int):
             node2 = Node(node2)
-        return node2 in [
-            edge.end for edge in self.get_all_possible_edges() if edge.begin == node1
-        ]
+        return node2 in [edge.end for edge in self.edges if edge.begin == node1]
 
     def to_adjacency_matrix(self) -> AdjencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
@@ -81,7 +71,6 @@ class SimpleGraph(Graph):
             n2 = edge.end.index
 
             adj_m[n1 - 1][n2 - 1] = edge.weight
-            adj_m[n2 - 1][n1 - 1] = edge.weight
 
         return adj_m
 
@@ -92,12 +81,12 @@ class SimpleGraph(Graph):
             n1 = edge.begin.index
             n2 = edge.end.index
 
-            inc_m[n1 - 1][i] = edge.weight
+            inc_m[n1 - 1][i] = -edge.weight
             inc_m[n2 - 1][i] = edge.weight
 
         return inc_m
 
-    def fill_from_adjacency_matrix(self, adj_m: AdjencyMatrix) -> SimpleGraph:
+    def fill_from_adjacency_matrix(self, adj_m: AdjencyMatrix) -> DirectedGraph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
         self.clear()
 
@@ -106,12 +95,12 @@ class SimpleGraph(Graph):
 
         for n1 in range(len(self)):
             for n2 in range(len(self)):
-                if n1 < n2 and adj_m[n1][n2]:
+                if adj_m[n1][n2]:
                     # mapowanie numerów wierzchołków: n-1 -> n
                     self.connect(n1 + 1, n2 + 1, weight=adj_m[n1][n2])
         return self
 
-    def fill_from_incidence_matrix(self, inc_m: IncidenceMatrix) -> SimpleGraph:
+    def fill_from_incidence_matrix(self, inc_m: IncidenceMatrix) -> DirectedGraph:
         """Wypełnianie grafu z macierzy incydencji"""
         self.clear()
 
@@ -120,15 +109,17 @@ class SimpleGraph(Graph):
 
         edges_count = len(inc_m[0])
         for i in range(edges_count):  # il. krawedzi
-            edge_nodes = []
             weight = 0
             for n in range(nodes_count):
                 # szukamy niezerowej wartosci w kolumnie
                 if inc_m[n][i]:
-                    edge_nodes.append(n)
-                    weight = inc_m[n][i]
+                    if inc_m[n][i] < 0:
+                        begin = n
+                    else:
+                        end = n
+                    weight = abs(inc_m[n][i])
             # mapowanie numerów wierzchołków: n-1 -> n
             self.connect(
-                Node(edge_nodes[0] + 1), Node(edge_nodes[1] + 1), weight=weight
+                Node(begin + 1), Node(end + 1), weight=weight
             )
         return self

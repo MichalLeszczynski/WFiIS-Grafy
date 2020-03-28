@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import itertools
 import random
+import os
 from typing import Set, Dict, List, Any, Union
 from abc import ABC, abstractmethod
 from spacja.helper_structures import Node, Edge, Weight
@@ -17,6 +18,8 @@ class Graph(ABC):
     def __init__(self, size=0) -> None:
         self.nodes: Set[Node] = set()
         self.edges: Set[Edge] = set()
+        self.separator = ""
+
         self.clear()
         self.add_nodes(count=size)
 
@@ -38,20 +41,35 @@ class Graph(ABC):
         self.nodes.clear()
         self.edges.clear()
 
+    def is_weighted_graph(self) -> bool:
+        return any(edge.weight != 1 for edge in self.edges)
+
     @abstractmethod
+    def get_all_possible_edges(self) -> Set[Edge]:
+        pass
+
     def node_neighbours(self, node: Node) -> Set[Node]:
         """Returns Nodes adjecent to a given node """
-        pass
+        return set([edge.end for edge in self.node_edges(node)])
 
-    @abstractmethod
     def node_edges(self, node: Node) -> Set[Edge]:
         """Returns set of edges adjacent to the given node """
-        pass
+        return set(
+            [edge for edge in self.get_all_possible_edges() if edge.begin == node]
+        )
 
-    @abstractmethod
     def node_degree(self, node: Node) -> int:
         """Returns degree of a selected node """
-        pass
+        return len(self.node_edges(node))
+
+    def edge_to_node(self, begin: Node, end: Node) -> Edge:
+        """Get edge that connects given two nodes """
+        edge = [
+            e
+            for e in self.get_all_possible_edges()
+            if e.begin == begin and e.end == end
+        ][0]
+        return edge
 
     @abstractmethod
     def connect(
@@ -69,10 +87,22 @@ class Graph(ABC):
         """Czy stnieje krawędź node1 -- node2"""
         pass
 
-    @abstractmethod
     def to_adjacency_list(self) -> AdjencyList:
         """Zwraca graf w postaci listy sąsiedztwa"""
-        pass
+        adj_l = {
+            (node.index): (
+                set(
+                    [
+                        edge.end.index
+                        for edge in self.get_all_possible_edges()
+                        if edge.begin == node
+                    ]
+                )
+            )
+            for node in self.nodes
+        }
+        return adj_l
+
 
     @abstractmethod
     def to_adjacency_matrix(self) -> AdjencyMatrix:
@@ -106,7 +136,6 @@ class Graph(ABC):
         """Wypełnianie grafu z macierzy incydencji"""
         pass
 
-    @abstractmethod
     def save(
         self, filename: str, file_format: str = "g", engine: str = "circo"
     ) -> None:
@@ -116,7 +145,42 @@ class Graph(ABC):
             png - plik graficzny http://www.graphviz.org/
                 engine = dot, neato, circo ...
         """
-        pass
+        if file_format == "g":
+            filename += ".g"
+            print(f'Zapisywanie grafu do pliku "{filename}"')
+            with open(filename, "w") as f:
+                f.write(f"{len(self)}\n")
+                for edge in self.edges:
+                    n1 = edge.begin.index
+                    n2 = edge.end.index
+                    f.write(f"{n1} {n2}\n")
+
+        elif file_format == "gv":
+            with open(f"{filename}.{file_format}", "w") as f:
+                f.write("graph g {\n")
+                for edge in self.edges:
+                    label = (
+                        f'[label="{edge.weight}",weight="{edge.weight}"]'
+                        if self.is_weighted_graph()
+                        else ""
+                    )
+                    n1 = edge.begin.index
+                    n2 = edge.end.index
+                    f.write(f"{n1} {self.separator} {n2}{label}\n")
+                connected_nodes = [edge.begin for edge in self.get_all_possible_edges()]
+                not_connected_nodes = [
+                    node for node in self.nodes if node not in connected_nodes
+                ]
+                for node in not_connected_nodes:
+                    f.write(f"{node.index}\n")
+
+                f.write("}\n")
+
+        elif file_format == "png":
+            self.save(filename, file_format="gv")
+            filename += ".gv"
+            os.system(f"dot -T png -K {engine} -O {filename}")
+            os.system(f"rm {filename}")
 
     def load(self, filename: str) -> None:
         """Wczytaj graf z pliku w formacie .g"""

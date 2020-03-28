@@ -6,6 +6,7 @@ from spacja.graph import Node
 from spacja.simple_graph import SimpleGraph
 from spacja.helper_structures import Matrix
 
+
 def find_eulerian_trail(g) -> List[Node]:
     """Znajduje losowy cykl Eulera w grafie"""
     if not g.is_eulerian():
@@ -89,10 +90,11 @@ def find_shortest_path_dijkstra(
                     distance[v.index] = new_distance
                     v.predecessor = u
 
-    d = {node: distance[node.index] for node in g.nodes}
+    d = {node: int(distance[node.index]) for node in g.nodes}
     p = {node: node.predecessor for node in g.nodes}
 
     return (d, p)
+
 
 def get_distances_to_nodes_matrix(g: SimpleGraph) -> Matrix:
     distances_matrix = [[0 for _ in g.nodes] for _ in g.nodes]
@@ -103,6 +105,7 @@ def get_distances_to_nodes_matrix(g: SimpleGraph) -> Matrix:
 
     return distances_matrix
 
+
 def get_graph_center(g: SimpleGraph) -> Node:
     distances_matrix = get_distances_to_nodes_matrix(g)
     summary_distances = [
@@ -111,6 +114,7 @@ def get_graph_center(g: SimpleGraph) -> Node:
     graph_center = Node(summary_distances.index(min(summary_distances)) + 1)
     return graph_center
 
+
 def get_minimax_graph_center(g: SimpleGraph) -> Node:
     distances_matrix = get_distances_to_nodes_matrix(g)
     max_distances = [
@@ -118,6 +122,7 @@ def get_minimax_graph_center(g: SimpleGraph) -> Node:
     ]
     minimax_graph_center = Node(max_distances.index(min(max_distances)) + 1)
     return minimax_graph_center
+
 
 def get_minimal_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
     """ Przyjmuje graf

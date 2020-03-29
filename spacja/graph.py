@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from __future__ import annotations
 
 import itertools
@@ -102,7 +101,6 @@ class Graph(ABC):
             for node in self.nodes
         }
         return adj_l
-
 
     @abstractmethod
     def to_adjacency_matrix(self) -> AdjencyMatrix:

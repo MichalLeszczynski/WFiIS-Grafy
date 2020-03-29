@@ -1,10 +1,6 @@
 import pytest
 
-from spacja.functions import (
-    is_valid_graph_sequence,
-    get_all_trails_from_predecessors,
-    get_trail_to_node,
-)
+from spacja.functions import is_valid_graph_sequence
 
 GRAPH_SEQUENCES = [
     ([4, 3, 3, 2, 2, 1, 1], True),
@@ -18,8 +14,10 @@ class TestFunctions:
     def test_is_valid_graph_sequence(self, sequence, result):
         assert is_valid_graph_sequence(sequence) == result
 
-    def test_get_all_trails_from_predecessors(self):
-        pass
-
-    def test_get_trail_to_node(self):
-        pass
+    # def test_get_all_trails_from_predecessors(self):
+    #     # TODO
+    #     pass
+    #
+    # def test_get_trail_to_node(self):
+    #     # TODO
+    #     pass

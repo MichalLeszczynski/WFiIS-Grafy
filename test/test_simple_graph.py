@@ -1,6 +1,6 @@
 import pytest
 
-from spacja.graph import Node, Edge
+from spacja.graph import Node
 from spacja.simple_graph import SimpleGraph
 
 

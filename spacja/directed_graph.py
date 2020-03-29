@@ -119,7 +119,5 @@ class DirectedGraph(Graph):
                         end = n
                     weight = abs(inc_m[n][i])
             # mapowanie numerów wierzchołków: n-1 -> n
-            self.connect(
-                Node(begin + 1), Node(end + 1), weight=weight
-            )
+            self.connect(Node(begin + 1), Node(end + 1), weight=weight)
         return self

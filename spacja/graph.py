@@ -1,15 +1,15 @@
-#!/usr/bin/env python3
 from __future__ import annotations
 
 import itertools
 import random
+import os
 from typing import Set, Dict, List, Any, Union
 from abc import ABC, abstractmethod
 from spacja.helper_structures import Node, Edge, Weight
 from spacja.functions import is_valid_graph_sequence  # type: ignore
 
-AdjencyList = Dict[int, Set[int]]
-AdjencyMatrix = List[List[int]]
+AdjacencyList = Dict[int, Set[int]]
+AdjacencyMatrix = List[List[int]]
 IncidenceMatrix = List[List[int]]
 
 
@@ -17,6 +17,8 @@ class Graph(ABC):
     def __init__(self, size=0) -> None:
         self.nodes: Set[Node] = set()
         self.edges: Set[Edge] = set()
+        self.separator = ""
+
         self.clear()
         self.add_nodes(count=size)
 
@@ -38,20 +40,37 @@ class Graph(ABC):
         self.nodes.clear()
         self.edges.clear()
 
+    def is_weighted_graph(self) -> bool:
+        return any(edge.weight != 1 for edge in self.edges)
+
     @abstractmethod
+    def get_all_possible_edges(self) -> Set[Edge]:
+        """Returns edges that are all possible moves from edge.begin to edge.end
+            Especially usable in simple graphs
+        """
+
     def node_neighbours(self, node: Node) -> Set[Node]:
         """Returns Nodes adjecent to a given node """
-        pass
+        return set([edge.end for edge in self.node_edges(node)])
 
-    @abstractmethod
     def node_edges(self, node: Node) -> Set[Edge]:
         """Returns set of edges adjacent to the given node """
-        pass
+        return set(
+            [edge for edge in self.get_all_possible_edges() if edge.begin == node]
+        )
 
-    @abstractmethod
     def node_degree(self, node: Node) -> int:
         """Returns degree of a selected node """
-        pass
+        return len(self.node_edges(node))
+
+    def edge_to_node(self, begin: Node, end: Node) -> Edge:
+        """Get edge that connects given two nodes """
+        edge = [
+            e
+            for e in self.get_all_possible_edges()
+            if e.begin == begin and e.end == end
+        ][0]
+        return edge
 
     @abstractmethod
     def connect(
@@ -62,29 +81,36 @@ class Graph(ABC):
     @abstractmethod
     def disconnect(self, node1: Union[Node, int], node2: Union[Node, int]) -> None:
         """Usuwa krawędż między wierzchołkiem node1 a node2"""
-        pass
 
     @abstractmethod
     def is_connected(self, node1: Union[Node, int], node2: Union[Node, int]) -> bool:
         """Czy stnieje krawędź node1 -- node2"""
-        pass
 
-    @abstractmethod
-    def to_adjacency_list(self) -> AdjencyList:
+    def to_adjacency_list(self) -> AdjacencyList:
         """Zwraca graf w postaci listy sąsiedztwa"""
-        pass
+        adj_l = {
+            (node.index): (
+                set(
+                    [
+                        edge.end.index
+                        for edge in self.get_all_possible_edges()
+                        if edge.begin == node
+                    ]
+                )
+            )
+            for node in self.nodes
+        }
+        return adj_l
 
     @abstractmethod
-    def to_adjacency_matrix(self) -> AdjencyMatrix:
+    def to_adjacency_matrix(self) -> AdjacencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
-        pass
 
     @abstractmethod
     def to_incidence_matrix(self) -> IncidenceMatrix:
         """Zwraca graf w postaci macierzy incydencji"""
-        pass
 
-    def fill_from_adjacency_list(self, adj_l: AdjencyList) -> Graph:
+    def fill_from_adjacency_list(self, adj_l: AdjacencyList) -> Graph:
         """Wypełnianie grafu z lsity sąsiedztwa"""
         self.clear()
 
@@ -97,16 +123,13 @@ class Graph(ABC):
         return self
 
     @abstractmethod
-    def fill_from_adjacency_matrix(self, adj_m: AdjencyMatrix) -> Graph:
+    def fill_from_adjacency_matrix(self, adj_m: AdjacencyMatrix) -> Graph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
-        pass
 
     @abstractmethod
     def fill_from_incidence_matrix(self, inc_m: IncidenceMatrix) -> Graph:
         """Wypełnianie grafu z macierzy incydencji"""
-        pass
 
-    @abstractmethod
     def save(
         self, filename: str, file_format: str = "g", engine: str = "circo"
     ) -> None:
@@ -116,7 +139,42 @@ class Graph(ABC):
             png - plik graficzny http://www.graphviz.org/
                 engine = dot, neato, circo ...
         """
-        pass
+        if file_format == "g":
+            filename += ".g"
+            print(f'Zapisywanie grafu do pliku "{filename}"')
+            with open(filename, "w") as f:
+                f.write(f"{len(self)}\n")
+                for edge in self.edges:
+                    n1 = edge.begin.index
+                    n2 = edge.end.index
+                    f.write(f"{n1} {n2}\n")
+
+        elif file_format == "gv":
+            with open(f"{filename}.{file_format}", "w") as f:
+                f.write("graph g {\n")
+                for edge in self.edges:
+                    label = (
+                        f'[label="{edge.weight}",weight="{edge.weight}"]'
+                        if self.is_weighted_graph()
+                        else ""
+                    )
+                    n1 = edge.begin.index
+                    n2 = edge.end.index
+                    f.write(f"{n1} {self.separator} {n2}{label}\n")
+                connected_nodes = [edge.begin for edge in self.get_all_possible_edges()]
+                not_connected_nodes = [
+                    node for node in self.nodes if node not in connected_nodes
+                ]
+                for node in not_connected_nodes:
+                    f.write(f"{node.index}\n")
+
+                f.write("}\n")
+
+        elif file_format == "png":
+            self.save(filename, file_format="gv")
+            filename += ".gv"
+            os.system(f"dot -T png -K {engine} -O {filename}")
+            os.system(f"rm {filename}")
 
     def load(self, filename: str) -> None:
         """Wczytaj graf z pliku w formacie .g"""
@@ -176,7 +234,7 @@ class Graph(ABC):
         return comp
 
     def components_r(
-        self, nr: int, v: int, comp: Dict[int, int], g: AdjencyList
+        self, nr: int, v: int, comp: Dict[int, int], g: AdjacencyList
     ) -> None:
         """Rekursywne przeszukiwanie wgłąb"""
         for u in g[v]:

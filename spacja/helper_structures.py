@@ -5,6 +5,7 @@ from typing import Any, List
 Weight = int
 Matrix = List[List[int]]
 
+
 @dataclass
 class Node:
     index: int = 0

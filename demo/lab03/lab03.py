@@ -19,9 +19,10 @@ from spacja.functions import get_all_trails_from_predecessors
 # 1
 print("\n\n***** 1 *****")
 
-g = gb.get_random_weighted_connected_graph(8)
+g = gb.get_random_weighted_connected_graph(12)
 print(g)
 pprint(g.edges)
+g.save("lab03", file_format="png")
 
 # 2
 print("\n\n***** 2 *****")
@@ -48,13 +49,9 @@ pprint(g.to_adjacency_matrix())
 # 4
 print("\n\n***** 4 *****")
 
-print(
-    f"\nCentrum grafu: {get_graph_center(g).index}"
-)
+print(f"\nCentrum grafu: {get_graph_center(g).index}")
 
-print(
-    f"\nMinimaxowe centrum grafu: {get_minimax_graph_center(g).index}"
-)
+print(f"\nMinimaxowe centrum grafu: {get_minimax_graph_center(g).index}")
 
 
 # 5

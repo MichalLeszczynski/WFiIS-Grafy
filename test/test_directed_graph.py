@@ -95,7 +95,6 @@ class TestDirectedGraph:
         g = DirectedGraph(8)
         g.add_random_edges(15)
 
-        # TODO: add hard-coded test
         before = g.to_adjacency_list()
         g.fill_from_adjacency_list(before)
         after = g.to_adjacency_list()
@@ -106,7 +105,6 @@ class TestDirectedGraph:
         g = DirectedGraph(8)
         g.add_random_edges(15)
 
-        # TODO: add hard-coded test
         before = g.to_adjacency_matrix()
         g.fill_from_adjacency_matrix(before)
         after = g.to_adjacency_matrix()
@@ -116,7 +114,6 @@ class TestDirectedGraph:
     def test_incidence_matrix(self):
         g = DirectedGraph(8)
         g.add_random_edges(15)
-        # TODO: add hard-coded test
         before = g.to_adjacency_list()
         g.fill_from_incidence_matrix(g.to_incidence_matrix())
         after = g.to_adjacency_list()

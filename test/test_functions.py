@@ -14,10 +14,3 @@ class TestFunctions:
     def test_is_valid_graph_sequence(self, sequence, result):
         assert is_valid_graph_sequence(sequence) == result
 
-    # def test_get_all_trails_from_predecessors(self):
-    #     # TODO
-    #     pass
-    #
-    # def test_get_trail_to_node(self):
-    #     # TODO
-    #     pass

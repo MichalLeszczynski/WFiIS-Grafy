@@ -73,10 +73,6 @@ class TestAlgorithms:
 
     GRAPHS_WITH_MINIMAX_CENTERS = [(G1, 2), (G2, 7), (G3, 1), (G4, 6)]
 
-    # def test_find_shortest_path_dijkstra(self):
-    #     # TODO
-    #     pass
-
     @pytest.mark.parametrize("graph, center", GRAPHS_WITH_CENTERS)
     def test_get_graph_center(self, graph, center):
         g = SimpleGraph().fill_from_adjacency_matrix(graph)

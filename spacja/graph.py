@@ -45,7 +45,9 @@ class Graph(ABC):
 
     @abstractmethod
     def get_all_possible_edges(self) -> Set[Edge]:
-        pass
+        """Returns edges that are all possible moves from edge.begin to edge.end
+            Especially usable in simple graphs
+        """
 
     def node_neighbours(self, node: Node) -> Set[Node]:
         """Returns Nodes adjecent to a given node """
@@ -79,12 +81,10 @@ class Graph(ABC):
     @abstractmethod
     def disconnect(self, node1: Union[Node, int], node2: Union[Node, int]) -> None:
         """Usuwa krawędż między wierzchołkiem node1 a node2"""
-        pass
 
     @abstractmethod
     def is_connected(self, node1: Union[Node, int], node2: Union[Node, int]) -> bool:
         """Czy stnieje krawędź node1 -- node2"""
-        pass
 
     def to_adjacency_list(self) -> AdjencyList:
         """Zwraca graf w postaci listy sąsiedztwa"""
@@ -105,12 +105,10 @@ class Graph(ABC):
     @abstractmethod
     def to_adjacency_matrix(self) -> AdjencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
-        pass
 
     @abstractmethod
     def to_incidence_matrix(self) -> IncidenceMatrix:
         """Zwraca graf w postaci macierzy incydencji"""
-        pass
 
     def fill_from_adjacency_list(self, adj_l: AdjencyList) -> Graph:
         """Wypełnianie grafu z lsity sąsiedztwa"""
@@ -127,12 +125,10 @@ class Graph(ABC):
     @abstractmethod
     def fill_from_adjacency_matrix(self, adj_m: AdjencyMatrix) -> Graph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
-        pass
 
     @abstractmethod
     def fill_from_incidence_matrix(self, inc_m: IncidenceMatrix) -> Graph:
         """Wypełnianie grafu z macierzy incydencji"""
-        pass
 
     def save(
         self, filename: str, file_format: str = "g", engine: str = "circo"

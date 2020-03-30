@@ -8,8 +8,8 @@ from spacja.graph import (
     Node,
     Edge,
     Weight,
-    AdjencyList,
-    AdjencyMatrix,
+    AdjacencyList,
+    AdjacencyMatrix,
     IncidenceMatrix,
 )
 
@@ -73,7 +73,7 @@ class SimpleGraph(Graph):
             edge.end for edge in self.get_all_possible_edges() if edge.begin == node1
         ]
 
-    def to_adjacency_matrix(self) -> AdjencyMatrix:
+    def to_adjacency_matrix(self) -> AdjacencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
         adj_m = [[0 for _ in range(len(self))] for _ in range(len(self))]
         for edge in self.edges:
@@ -97,7 +97,7 @@ class SimpleGraph(Graph):
 
         return inc_m
 
-    def fill_from_adjacency_matrix(self, adj_m: AdjencyMatrix) -> SimpleGraph:
+    def fill_from_adjacency_matrix(self, adj_m: AdjacencyMatrix) -> SimpleGraph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
         self.clear()
 

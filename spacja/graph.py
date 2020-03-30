@@ -8,8 +8,8 @@ from abc import ABC, abstractmethod
 from spacja.helper_structures import Node, Edge, Weight
 from spacja.functions import is_valid_graph_sequence  # type: ignore
 
-AdjencyList = Dict[int, Set[int]]
-AdjencyMatrix = List[List[int]]
+AdjacencyList = Dict[int, Set[int]]
+AdjacencyMatrix = List[List[int]]
 IncidenceMatrix = List[List[int]]
 
 
@@ -86,7 +86,7 @@ class Graph(ABC):
     def is_connected(self, node1: Union[Node, int], node2: Union[Node, int]) -> bool:
         """Czy stnieje krawędź node1 -- node2"""
 
-    def to_adjacency_list(self) -> AdjencyList:
+    def to_adjacency_list(self) -> AdjacencyList:
         """Zwraca graf w postaci listy sąsiedztwa"""
         adj_l = {
             (node.index): (
@@ -103,14 +103,14 @@ class Graph(ABC):
         return adj_l
 
     @abstractmethod
-    def to_adjacency_matrix(self) -> AdjencyMatrix:
+    def to_adjacency_matrix(self) -> AdjacencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
 
     @abstractmethod
     def to_incidence_matrix(self) -> IncidenceMatrix:
         """Zwraca graf w postaci macierzy incydencji"""
 
-    def fill_from_adjacency_list(self, adj_l: AdjencyList) -> Graph:
+    def fill_from_adjacency_list(self, adj_l: AdjacencyList) -> Graph:
         """Wypełnianie grafu z lsity sąsiedztwa"""
         self.clear()
 
@@ -123,7 +123,7 @@ class Graph(ABC):
         return self
 
     @abstractmethod
-    def fill_from_adjacency_matrix(self, adj_m: AdjencyMatrix) -> Graph:
+    def fill_from_adjacency_matrix(self, adj_m: AdjacencyMatrix) -> Graph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
 
     @abstractmethod
@@ -234,7 +234,7 @@ class Graph(ABC):
         return comp
 
     def components_r(
-        self, nr: int, v: int, comp: Dict[int, int], g: AdjencyList
+        self, nr: int, v: int, comp: Dict[int, int], g: AdjacencyList
     ) -> None:
         """Rekursywne przeszukiwanie wgłąb"""
         for u in g[v]:

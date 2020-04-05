@@ -13,4 +13,3 @@ class TestFunctions:
     @pytest.mark.parametrize("sequence, result", GRAPH_SEQUENCES)
     def test_is_valid_graph_sequence(self, sequence, result):
         assert is_valid_graph_sequence(sequence) == result
-

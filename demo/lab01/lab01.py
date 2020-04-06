@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""       Example usecases:
-        ./lab01.py --load lab01.al --save al am im png
-        ./lab01.py -n 10 -p 0.5 --save al
-        ./lab01.py -n 9 -l 25 --save png
-"""
 
 import argparse
 import sys

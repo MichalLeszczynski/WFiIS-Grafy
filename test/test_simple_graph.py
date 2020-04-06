@@ -105,8 +105,8 @@ class TestSimpleGraph:
         g.add_random_edges(15)
 
         before = g.to_adjacency_list()
-        g.save("test")
-        g.load("test.g")
+        g.save("test", "al")
+        g.load("test.al")
         after = g.to_adjacency_list()
         assert before == after
 

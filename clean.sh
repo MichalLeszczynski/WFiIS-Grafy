@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 find . -name "*.gv" | xargs rm
 find . -name "*.g" | xargs rm
+find . -name "*.al" | xargs rm
+find . -name "*.am" | xargs rm
+find . -name "*.im" | xargs rm
 find . -name "*.png" | xargs rm
 find . -name "*.coverage" | xargs rm
 find . -name ".pytest_cache" | xargs rm -rf

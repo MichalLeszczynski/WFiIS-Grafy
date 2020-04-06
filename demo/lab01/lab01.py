@@ -1,67 +1,72 @@
 #!/usr/bin/env python3
+"""       Example usecases:
+        ./lab01.py --load lab01.al --save al am im png
+        ./lab01.py -n 10 -p 0.5 --save al
+        ./lab01.py -n 9 -l 25 --save png
+"""
 
+import argparse
 import sys
 from pprint import pprint
 
 sys.path.insert(0, "../..")
 from spacja.simple_graph import SimpleGraph
 
-g = SimpleGraph(5)
-g.connect(1, 2)
-g.connect(2, 3)
-g.connect(3, 4)
-g.connect(4, 5)
-g.connect(5, 1)
-g.connect(5, 2)
-g.connect(2, 4)
 
-print(g)
-print(g.edges)
+def main():
+    parser = argparse.ArgumentParser(
+        description="Utility to generate simple graphs, and load/safe them from/to file."
+    )
+    parser.add_argument("--load", help="Load a graph from file")
+    parser.add_argument("-n", help="Generate graph with N vertices")
 
-print("\nZapis do pliku")
-g.save("lab01")
-g.save("lab01", file_format="gv")
-g.load("lab01.g")
+    parser.add_argument("-l", help="Generate graph with L edges")
+    parser.add_argument(
+        "-p", help="Generate graph with P probability of each edge existence"
+    )
 
-print(g)
-print(g.edges)
+    parser.add_argument(
+        "--save",
+        nargs="*",
+        help="Save graph to a specified format (am, al, im)",
+        action="append",
+    )
 
-print("\nMacierz sąsiedztwa\n")
+    args = parser.parse_args()
+    print(args)
 
-pprint(g.to_adjacency_matrix())
-print("\nPo konwersji:\n")
-g.fill_from_adjacency_matrix(g.to_adjacency_matrix())
+    g = load_graph_to_work_on(args)
 
-print(g)
-pprint(g.edges)
+    print("\nTo adjacency list:")
+    pprint(g.to_adjacency_list())
+    print("\nTo adjacency matrix:")
+    pprint(g.to_adjacency_matrix())
+    print("\nTo incidence matrix:")
+    pprint(g.to_incidence_matrix())
 
-print("\nMacierz incydencji")
-
-pprint(g.to_incidence_matrix())
-
-print("\nPo konwersji:\n")
-
-g.fill_from_incidence_matrix(g.to_incidence_matrix())
-
-print(g)
-pprint(g.edges)
-
-print("\nDodawanie losowych krawędzi")
-g = SimpleGraph(8)
-g.add_random_edges(17)
-
-print(g)
-pprint(g.edges)
+    save_if_needed(g, args)
 
 
-print("\nLosowe łączenie wierzchołków")
-g = SimpleGraph(12)
-g.connect_random(0.5)
+def load_graph_to_work_on(args):
+    g = SimpleGraph()
 
-print(g)
-pprint(g.edges)
+    if args.load:
+        g.load(args.load)
 
-# Rysowanie grafu
-# Dla małych grafów lub słabo połączonych nie rysuje dokładnego okręgu
-g.save("lab01_circo", file_format="png", engine="circo")
-g.save("lab01_dot", file_format="png", engine="dot")
+    elif args.n:
+        g.add_nodes(int(args.n))
+        if args.l:
+            g.add_random_edges(int(args.l))
+        elif args.p:
+            g.connect_random(float(args.p))
+    return g
+
+
+def save_if_needed(g, args):
+    if args.save:
+        for format in args.save[0]:
+            g.save("lab01", file_format=format)
+
+
+if __name__ == "__main__":
+    main()

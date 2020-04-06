@@ -5,6 +5,7 @@ import random
 import os
 from typing import Set, Dict, List, Any, Union
 from abc import ABC, abstractmethod
+import json
 from spacja.helper_structures import Node, Edge, Weight
 from spacja.functions import is_valid_graph_sequence  # type: ignore
 
@@ -131,23 +132,29 @@ class Graph(ABC):
         """Wypełnianie grafu z macierzy incydencji"""
 
     def save(
-        self, filename: str, file_format: str = "g", engine: str = "circo"
+        self, filename: str, file_format: str = "am", engine: str = "circo"
     ) -> None:
         """Zapisz graf w różnych formatach
-            g - lista sąsiedztwa
+            al - lista sąsiedztwa
+            am - macierz sąsiedztwa
+            im - macierz incydencji
             gv - dot format
             png - plik graficzny http://www.graphviz.org/
                 engine = dot, neato, circo ...
+            PROTIP: black fajnie formatuje .al, .am i .im 
         """
-        if file_format == "g":
-            filename += ".g"
-            print(f'Zapisywanie grafu do pliku "{filename}"')
+        if file_format == "al":
+            filename += ".al"
             with open(filename, "w") as f:
-                f.write(f"{len(self)}\n")
-                for edge in self.edges:
-                    n1 = edge.begin.index
-                    n2 = edge.end.index
-                    f.write(f"{n1} {n2}\n")
+                f.write(self.to_adjacency_list().__str__())
+        elif file_format == "am":
+            filename += ".am"
+            with open(filename, "w") as f:
+                f.write(self.to_adjacency_matrix().__str__())
+        elif file_format == "im":
+            filename += ".im"
+            with open(filename, "w") as f:
+                f.write(self.to_incidence_matrix().__str__())
 
         elif file_format == "gv":
             with open(f"{filename}.{file_format}", "w") as f:
@@ -177,19 +184,17 @@ class Graph(ABC):
             os.system(f"rm {filename}")
 
     def load(self, filename: str) -> None:
-        """Wczytaj graf z pliku w formacie .g"""
+        """Wczytaj graf z pliku w formacie .al, .am lub .im"""
         print('Wczytywanie grafu z pliku "{}"'.format(filename))
-        self.clear()
 
         with open(filename, "r") as f:
-            # Pierwsza linia - liczba wierzchołków
-            size = int(f.readline())
-            self.add_nodes(size)
-
-            # Pozostałe linie - krawędzie
-            for l in f:
-                l1, l2 = l.split(" ")
-                self.connect(int(l1), int(l2))
+            data = eval(f.read())
+            if filename.endswith(".al"):
+                self.fill_from_adjacency_list(data)
+            elif filename.endswith(".am"):
+                self.fill_from_adjacency_matrix(data)
+            elif filename.endswith(".im"):
+                self.fill_from_incidence_matrix(data)
 
     def add_random_edges(self, count: int = 1) -> None:
         """Tworzy określoną ilość losowych krawędzi"""

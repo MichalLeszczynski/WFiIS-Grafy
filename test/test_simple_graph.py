@@ -22,65 +22,18 @@ class TestSimpleGraph:
         with pytest.raises(ValueError):
             g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1])
 
-    def test_connect_with_node(self):
+    def test_connect(self):
         g = SimpleGraph(8)
-        index_1 = 1
-        index_2 = 2
-        n1 = Node(index_1)
-        n2 = Node(index_2)
-
+        n1 = 1
+        n2 = 2
+        
         g.connect(n1, n2)
-        assert g.is_connected(index_1, index_2)
         assert g.is_connected(n1, n2)
+        assert g.is_connected(n2, n1)
 
         g.disconnect(n1, n2)
-        assert not g.is_connected(index_1, index_2)
         assert not g.is_connected(n1, n2)
-
-    def test_connect_with_index(self):
-        g = SimpleGraph(8)
-        index_1 = 1
-        index_2 = 2
-        n1 = Node(index_1)
-        n2 = Node(index_2)
-        g.connect(index_1, index_2)
-        assert g.is_connected(index_1, index_2)
-        assert g.is_connected(n1, n2)
-
-        g.disconnect(index_1, index_2)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-
-    def test_connect_with_node_and_index(self):
-        g = SimpleGraph(8)
-        index_1 = 1
-        index_2 = 2
-        n1 = Node(index_1)
-        n2 = Node(index_2)
-        g.connect(index_1, index_2)
-        assert g.is_connected(index_1, index_2)
-        assert g.is_connected(index_2, index_1)
-        assert g.is_connected(n1, n2)
-
-        g.disconnect(n1, n2)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-
-        g.connect(n1, n2)
-        assert g.is_connected(index_1, index_2)
-        assert g.is_connected(n1, n2)
-
-        g.disconnect(index_1, index_2)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-
-        g.connect(n1, n2)
-        assert g.is_connected(index_1, index_2)
-        assert g.is_connected(n1, n2)
-
-        g.disconnect(index_2, index_1)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
+        assert not g.is_connected(n2, n1)
 
     def test_is_connected_graph(self):
         g = SimpleGraph(4)

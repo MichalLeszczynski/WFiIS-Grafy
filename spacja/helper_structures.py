@@ -4,21 +4,7 @@ from typing import Any, List
 
 Weight = int
 Matrix = List[List[int]]
-
-
-@dataclass
-class Node:
-    index: int = 0
-
-    def __str__(self) -> str:
-        return str(self.index)
-
-    def __hash__(self) -> Any:
-        return hash(str(self))
-
-    def __repr__(self):
-        return self.__str__()
-
+Node = int
 
 @dataclass
 class Edge:
@@ -37,5 +23,5 @@ class Edge:
         return self.__str__()
 
     def sort(self) -> None:  # tylko do grafów prostych!
-        if self.begin.index > self.end.index:
+        if self.begin > self.end:
             self.begin, self.end = self.end, self.begin

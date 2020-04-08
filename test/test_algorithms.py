@@ -35,8 +35,8 @@ class TestAlgorithms:
         for i in range(1, len(hamiltonian_circuit) - 1):
             assert g.is_connected(hamiltonian_circuit[i], hamiltonian_circuit[i + 1])
         # Sprawdź czy każdy wierzchołek (oprócz ostatniego) został odwiedzony dokładnie raz
-        assert sorted(hamiltonian_circuit, key=lambda x: x.index) == sorted(
-            g.nodes, key=lambda x: x.index
+        assert sorted(hamiltonian_circuit, key=lambda x: x) == sorted(
+            g.nodes, key=lambda x: x
         )
 
     G1 = [
@@ -76,12 +76,12 @@ class TestAlgorithms:
     @pytest.mark.parametrize("graph, center", GRAPHS_WITH_CENTERS)
     def test_get_graph_center(self, graph, center):
         g = SimpleGraph().fill_from_adjacency_matrix(graph)
-        assert get_graph_center(g).index == center
+        assert get_graph_center(g) == center
 
     @pytest.mark.parametrize("graph, minimax_center", GRAPHS_WITH_MINIMAX_CENTERS)
     def test_minimax_get_graph_center(self, graph, minimax_center):
         g = SimpleGraph().fill_from_adjacency_matrix(graph)
-        assert get_minimax_graph_center(g).index == minimax_center
+        assert get_minimax_graph_center(g) == minimax_center
 
     def test_get_minimal_spanning_tree_kruskal(self):
         g = gb.get_random_connected_graph()

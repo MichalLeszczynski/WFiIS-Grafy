@@ -23,14 +23,9 @@ class DirectedGraph(Graph):
         return self.edges
 
     def connect(
-        self, node1: Union[Node, int], node2: Union[Node, int], weight: Weight = 1
+        self, node1: Node, node2: Node, weight: Weight = 1
     ) -> None:
         """Tworzy krawędż między wierzchołkiem node1 a node2"""
-
-        if isinstance(node1, int):
-            node1 = Node(node1)
-        if isinstance(node2, int):
-            node2 = Node(node2)
 
         if node1 not in self.nodes or node2 not in self.nodes:
             raise ValueError
@@ -39,12 +34,8 @@ class DirectedGraph(Graph):
 
         self.edges.add(new_edge)
 
-    def disconnect(self, node1: Union[Node, int], node2: Union[Node, int]) -> None:
+    def disconnect(self, node1: Node, node2: Node) -> None:
         """Usuwa krawędż między wierzchołkiem node1 a node2"""
-        if isinstance(node1, int):
-            node1 = Node(node1)
-        if isinstance(node2, int):
-            node2 = Node(node2)
 
         if node1 not in self.nodes or node2 not in self.nodes or node1 == node2:
             raise ValueError
@@ -55,20 +46,17 @@ class DirectedGraph(Graph):
         edge_to_be_deleted = edges_to_be_deleted[0]
         self.edges.remove(edge_to_be_deleted)
 
-    def is_connected(self, node1: Union[Node, int], node2: Union[Node, int]) -> bool:
+    def is_connected(self, node1: Node, node2: Node) -> bool:
         """Czy stnieje krawędź node1 -- node2"""
-        if isinstance(node1, int):
-            node1 = Node(node1)
-        if isinstance(node2, int):
-            node2 = Node(node2)
+
         return node2 in [edge.end for edge in self.edges if edge.begin == node1]
 
     def to_adjacency_matrix(self) -> AdjacencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
         adj_m = [[0 for _ in range(len(self))] for _ in range(len(self))]
         for edge in self.edges:
-            n1 = edge.begin.index
-            n2 = edge.end.index
+            n1 = edge.begin
+            n2 = edge.end
 
             adj_m[n1 - 1][n2 - 1] = edge.weight
 
@@ -78,8 +66,8 @@ class DirectedGraph(Graph):
         """Zwraca graf w postaci macierzy incydencji"""
         inc_m = [[0 for _ in range(len(self.edges))] for _ in range(len(self))]
         for i, edge in enumerate(self.edges):
-            n1 = edge.begin.index
-            n2 = edge.end.index
+            n1 = edge.begin
+            n2 = edge.end
 
             inc_m[n1 - 1][i] = -edge.weight
             inc_m[n2 - 1][i] = edge.weight
@@ -119,5 +107,5 @@ class DirectedGraph(Graph):
                         end = n
                     weight = abs(inc_m[n][i])
             # mapowanie numerów wierzchołków: n-1 -> n
-            self.connect(Node(begin + 1), Node(end + 1), weight=weight)
+            self.connect(begin + 1, end + 1, weight=weight)
         return self

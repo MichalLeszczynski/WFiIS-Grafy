@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import random
 import os
-from typing import Set, Dict, List, Any, Union
+from typing import Set, Dict, List, Any
 from abc import ABC, abstractmethod
 import json
 from spacja.helper_structures import Node, Edge, Weight
@@ -26,7 +26,7 @@ class Graph(ABC):
     def add_nodes(self, count=1) -> None:
         """Tworzy nowe wierzchołki"""
         for i in range(len(self) + 1, len(self) + 1 + count):
-            self.nodes.add(Node(i))
+            self.nodes.add(i)
 
     def __len__(self) -> int:
         return len(self.nodes)
@@ -75,25 +75,25 @@ class Graph(ABC):
 
     @abstractmethod
     def connect(
-        self, node1: Union[Node, int], node2: Union[Node, int], weight: Weight = 1
+        self, node1: Node, node2: Node, weight: Weight = 1
     ) -> None:
         """Tworzy krawędż między wierzchołkiem node1 a node2"""
 
     @abstractmethod
-    def disconnect(self, node1: Union[Node, int], node2: Union[Node, int]) -> None:
+    def disconnect(self, node1: Node, node2: Node) -> None:
         """Usuwa krawędż między wierzchołkiem node1 a node2"""
 
     @abstractmethod
-    def is_connected(self, node1: Union[Node, int], node2: Union[Node, int]) -> bool:
+    def is_connected(self, node1: Node, node2: Node) -> bool:
         """Czy stnieje krawędź node1 -- node2"""
 
     def to_adjacency_list(self) -> AdjacencyList:
         """Zwraca graf w postaci listy sąsiedztwa"""
         adj_l = {
-            (node.index): (
+            (node): (
                 set(
                     [
-                        edge.end.index
+                        edge.end
                         for edge in self.get_all_possible_edges()
                         if edge.begin == node
                     ]
@@ -165,15 +165,15 @@ class Graph(ABC):
                         if self.is_weighted_graph()
                         else ""
                     )
-                    n1 = edge.begin.index
-                    n2 = edge.end.index
+                    n1 = edge.begin
+                    n2 = edge.end
                     f.write(f"{n1} {self.separator} {n2}{label}\n")
                 connected_nodes = [edge.begin for edge in self.get_all_possible_edges()]
                 not_connected_nodes = [
                     node for node in self.nodes if node not in connected_nodes
                 ]
                 for node in not_connected_nodes:
-                    f.write(f"{node.index}\n")
+                    f.write(f"{node}\n")
 
                 f.write("}\n")
 

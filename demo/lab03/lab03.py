@@ -49,9 +49,9 @@ pprint(g.to_adjacency_matrix())
 # 4
 print("\n\n***** 4 *****")
 
-print(f"\nCentrum grafu: {get_graph_center(g).index}")
+print(f"\nCentrum grafu: {get_graph_center(g)}")
 
-print(f"\nMinimaxowe centrum grafu: {get_minimax_graph_center(g).index}")
+print(f"\nMinimaxowe centrum grafu: {get_minimax_graph_center(g)}")
 
 
 # 5

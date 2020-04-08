@@ -64,30 +64,29 @@ def find_shortest_path_dijkstra(
         - slownik poprzednikow 
     """
 
-    for node in g.nodes:
-        node.is_visited = False
+    predecessors = {}
     distance = {}
     # kolejka priorytetowa dla wierzchołkow grafu (klucz: aktualnie wyliczona odleglosc)
     Q = []
     for node in g.nodes:
-        distance[node.index] = float("inf")
-        node.predecessor = None
+        distance[node] = float("inf")
+        predecessors[node] = None
         Q.append(node)
-    distance[source.index] = 0
+    distance[source] = 0
 
     while Q:
-        Q.sort(key=lambda n: distance[n.index])
+        Q.sort(key=lambda n: distance[n])
         u = Q.pop(0)
         for v in g.node_neighbours(u):
             if v in Q:
-                new_distance = distance[u.index] + g.edge_to_node(u, v).weight
-                old_distance = distance[v.index]
+                new_distance = distance[u] + g.edge_to_node(u, v).weight
+                old_distance = distance[v]
                 if new_distance < old_distance:
-                    distance[v.index] = new_distance
-                    v.predecessor = u
+                    distance[v] = new_distance
+                    predecessors[v] = u
 
-    d = {node: int(distance[node.index]) for node in g.nodes}
-    p = {node: node.predecessor for node in g.nodes}
+    d = {node: int(distance[node]) for node in g.nodes}
+    p = {node: predecessors[node] for node in g.nodes}
 
     return d, p
 
@@ -97,7 +96,7 @@ def get_distances_to_nodes_matrix(g: SimpleGraph) -> Matrix:
     for node in g.nodes:
         distances, _ = find_shortest_path_dijkstra(g, node)
         for to_node, distance in distances.items():
-            distances_matrix[node.index - 1][to_node.index - 1] = distance
+            distances_matrix[node - 1][to_node - 1] = distance
 
     return distances_matrix
 
@@ -107,7 +106,7 @@ def get_graph_center(g: SimpleGraph) -> Node:
     summary_distances = [
         sum(distances_from_node) for distances_from_node in distances_matrix
     ]
-    graph_center = Node(summary_distances.index(min(summary_distances)) + 1)
+    graph_center = summary_distances.index(min(summary_distances)) + 1
     return graph_center
 
 
@@ -116,7 +115,7 @@ def get_minimax_graph_center(g: SimpleGraph) -> Node:
     max_distances = [
         max(distances_from_node) for distances_from_node in distances_matrix
     ]
-    minimax_graph_center = Node(max_distances.index(min(max_distances)) + 1)
+    minimax_graph_center = max_distances.index(min(max_distances)) + 1
     return minimax_graph_center
 
 
@@ -135,6 +134,6 @@ def get_minimal_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
         Q.sort(key=lambda e: e.weight)
         current_edge = Q.pop(0)
         comps = mst.components()
-        if comps[current_edge.begin.index] != comps[current_edge.end.index]:
+        if comps[current_edge.begin] != comps[current_edge.end]:
             mst.edges.add(current_edge)
     return mst

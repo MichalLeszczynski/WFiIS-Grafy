@@ -7,7 +7,7 @@ from spacja.simple_graph import SimpleGraph
 class TestSimpleGraph:
     def test_from_graph_sequence(self):
         g = SimpleGraph()
-        g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
+        g.from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
         assert g.to_adjacency_list() == {
             1: {2, 3, 4, 5},
             2: {1, 3, 4},
@@ -20,7 +20,7 @@ class TestSimpleGraph:
         assert g.graph_sequence() == [4, 3, 3, 2, 2, 1, 1]
 
         with pytest.raises(ValueError):
-            g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1])
+            g.from_graph_sequence([4, 3, 3, 2, 2, 1])
 
     def test_connect(self):
         g = SimpleGraph(8)
@@ -45,7 +45,7 @@ class TestSimpleGraph:
         assert g.is_connected_graph()
 
     def test_add_random_edges(self):
-        g = SimpleGraph(8)  # max edges 28
+        g = SimpleGraph(8)  # 8 vertices => max 28 edges
         g.add_random_edges(8)
         assert len(g.edges) == 8
         g.add_random_edges(20)
@@ -68,7 +68,7 @@ class TestSimpleGraph:
         g.add_random_edges(15)
 
         before = g.to_adjacency_list()
-        g.fill_from_adjacency_list(before)
+        g.from_adjacency_list(before)
         after = g.to_adjacency_list()
 
         assert before == after
@@ -78,7 +78,7 @@ class TestSimpleGraph:
         g.add_random_edges(15)
 
         before = g.to_adjacency_matrix()
-        g.fill_from_adjacency_matrix(before)
+        g.from_adjacency_matrix(before)
         after = g.to_adjacency_matrix()
 
         assert before == after
@@ -88,16 +88,24 @@ class TestSimpleGraph:
         g.add_random_edges(15)
 
         before = g.to_adjacency_list()
-        g.fill_from_incidence_matrix(g.to_incidence_matrix())
+        g.from_incidence_matrix(g.to_incidence_matrix())
         after = g.to_adjacency_list()
 
         assert before == after
 
     def test_components(self):
         g = SimpleGraph()
-        g.fill_from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
+        g.from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
         comps = g.components()
 
         assert comps[1] == comps[2] == comps[3] == comps[4] == comps[5]
         assert comps[6] == comps[7]
         assert comps[1] != comps[6]
+
+    def test_component_list(self):
+        g = SimpleGraph()
+        g.from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
+        comps = g.component_list()
+
+        assert [1, 2, 3, 4, 5] in comps.values()
+        assert [6, 7] in comps.values()

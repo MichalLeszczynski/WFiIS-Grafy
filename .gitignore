@@ -135,5 +135,6 @@ dmypy.json
 *.png
 *.g
 *.gv
+*.al
 
 .idea

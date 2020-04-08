@@ -12,7 +12,7 @@ from spacja.algorithms import (
     get_distances_to_nodes_matrix,
     get_graph_center,
     get_minimax_graph_center,
-    get_minimal_spanning_tree_kruskal,
+    get_minimum_spanning_tree_kruskal,
 )
 from spacja.functions import get_all_trails_from_predecessors
 
@@ -59,7 +59,7 @@ print("\n\n***** 5 *****")
 print("\nGraf dla którego szukamy minimalnego drzewa rozpinającego:")
 print(g)
 print(g.edges)
-mst = get_minimal_spanning_tree_kruskal(g)
+mst = get_minimum_spanning_tree_kruskal(g)
 print("\nMinimalne drzewo rozpinające (szukane algorytmem kruskala):")
 print(mst)
 print(mst.edges)

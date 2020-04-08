@@ -37,7 +37,7 @@ class TestDirectedGraph:
         g.add_random_edges(15)
 
         before = g.to_adjacency_list()
-        g.fill_from_adjacency_list(before)
+        g.from_adjacency_list(before)
         after = g.to_adjacency_list()
 
         assert before == after
@@ -47,7 +47,7 @@ class TestDirectedGraph:
         g.add_random_edges(15)
 
         before = g.to_adjacency_matrix()
-        g.fill_from_adjacency_matrix(before)
+        g.from_adjacency_matrix(before)
         after = g.to_adjacency_matrix()
 
         assert before == after
@@ -56,7 +56,7 @@ class TestDirectedGraph:
         g = DirectedGraph(8)
         g.add_random_edges(15)
         before = g.to_adjacency_list()
-        g.fill_from_incidence_matrix(g.to_incidence_matrix())
+        g.from_incidence_matrix(g.to_incidence_matrix())
         after = g.to_adjacency_list()
 
         assert before == after

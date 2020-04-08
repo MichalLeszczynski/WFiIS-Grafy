@@ -10,7 +10,7 @@ from spacja.helper_structures import Matrix
 def find_eulerian_trail(g) -> List[Node]:
     """Znajduje losowy cykl Eulera w grafie"""
     if not g.is_eulerian():
-        raise ValueError("Nie jest to graf Eulerowski\n{}".format(g))
+        raise ValueError(f"Nie jest to graf Eulerowski\n{g}")
 
     solution = []
     stack = [random.choice(tuple(g.nodes))]
@@ -30,7 +30,7 @@ def find_hamiltonian_circuit(g) -> List[Node]:
     """Znajduje losowy cykl Hamiltona w grafie"""
     g = copy.deepcopy(g)
     if not g.is_connected_graph():
-        raise ValueError("Graf nie jest spójny")
+        raise ValueError(f"Graf nie jest spójny:\n{g}")
     stack = [random.choice(tuple(g.nodes))]
     solution = hamilton_search_r(g, stack)
     return solution
@@ -52,7 +52,7 @@ def hamilton_search_r(g, stack) -> List[Node]:
             stack.append(neighbour)
             if hamilton_search_r(g, stack):
                 return stack
-    raise ValueError("Nie jest to graf Hamiltonowski\n{}".format(g))
+    raise ValueError(f"Graf nie jest Hamiltonowski:\n{g}")
 
 
 def find_shortest_path_dijkstra(
@@ -119,12 +119,13 @@ def get_minimax_graph_center(g: SimpleGraph) -> Node:
     return minimax_graph_center
 
 
-def get_minimal_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
-    """ Przyjmuje graf
-        Zwraca jego minimalne drzewo rozpinające
-        Korzysta z algorytmu kruskala
+def get_minimum_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
+    """ 
+    Przyjmuje graf
+    Zwraca jego minimalne drzewo rozpinające
+    Korzysta z algorytmu kruskala
     """
-    # minimal spannig tree
+    # minimum spanning tree
     mst = SimpleGraph(len(g))
     Q = []
     for edge in g.edges:

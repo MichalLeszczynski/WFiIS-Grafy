@@ -84,7 +84,7 @@ class SimpleGraph(Graph):
 
         return inc_m
 
-    def fill_from_adjacency_matrix(self, adj_m: AdjacencyMatrix) -> SimpleGraph:
+    def from_adjacency_matrix(self, adj_m: AdjacencyMatrix) -> SimpleGraph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
         self.clear()
 
@@ -98,7 +98,7 @@ class SimpleGraph(Graph):
                     self.connect(n1 + 1, n2 + 1, weight=adj_m[n1][n2])
         return self
 
-    def fill_from_incidence_matrix(self, inc_m: IncidenceMatrix) -> SimpleGraph:
+    def from_incidence_matrix(self, inc_m: IncidenceMatrix) -> SimpleGraph:
         """Wypełnianie grafu z macierzy incydencji"""
         self.clear()
 

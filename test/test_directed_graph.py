@@ -5,81 +5,22 @@ from spacja.directed_graph import DirectedGraph
 
 
 class TestDirectedGraph:
-    def test_connect_with_node(self):
+    def test_connect(self):
         g = DirectedGraph(8)
-        index_1 = 1
-        index_2 = 2
-        n1 = Node(index_1)
-        n2 = Node(index_2)
-
+        n1 = 1
+        n2 = 2
+        
         g.connect(n1, n2)
-        assert g.is_connected(index_1, index_2)
-        assert g.is_connected(n1, n2)
-        assert not g.is_connected(index_2, index_1)
-        assert not g.is_connected(n2, n1)
-
-        g.disconnect(n1, n2)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-
-    def test_connect_with_index(self):
-        g = DirectedGraph(8)
-        index_1 = 1
-        index_2 = 2
-        n1 = Node(index_1)
-        n2 = Node(index_2)
-
-        g.connect(index_1, index_2)
-        assert g.is_connected(index_1, index_2)
-        assert g.is_connected(n1, n2)
-
-        g.disconnect(index_1, index_2)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-
-    def test_connect_with_node_and_index(self):
-        g = DirectedGraph(8)
-        index_1 = 1
-        index_2 = 2
-        n1 = Node(index_1)
-        n2 = Node(index_2)
-
-        g.connect(index_1, index_2)
-        assert g.is_connected(index_1, index_2)
-        assert not g.is_connected(index_2, index_1)
         assert g.is_connected(n1, n2)
         assert not g.is_connected(n2, n1)
 
         g.disconnect(n1, n2)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-
-        g.connect(n1, n2)
-        assert g.is_connected(index_1, index_2)
-        assert g.is_connected(n1, n2)
-
-        g.disconnect(index_1, index_2)
-        assert not g.is_connected(index_1, index_2)
         assert not g.is_connected(n1, n2)
 
         g.connect(n1, n2)
         g.connect(n2, n1)
-        assert g.is_connected(index_1, index_2)
         assert g.is_connected(n1, n2)
-        assert g.is_connected(index_2, index_1)
         assert g.is_connected(n2, n1)
-
-        g.disconnect(index_1, index_2)
-        assert g.is_connected(index_2, index_1)
-        assert g.is_connected(n2, n1)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-
-        g.disconnect(index_2, index_1)
-        assert not g.is_connected(index_1, index_2)
-        assert not g.is_connected(n1, n2)
-        assert not g.is_connected(index_2, index_1)
-        assert not g.is_connected(n2, n1)
 
     def test_save_to_file_and_load(self):
         g = DirectedGraph(8)

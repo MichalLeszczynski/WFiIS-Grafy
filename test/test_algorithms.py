@@ -8,7 +8,7 @@ from spacja.algorithms import (
     get_distances_to_nodes_matrix,
     get_graph_center,
     get_minimax_graph_center,
-    get_minimal_spanning_tree_kruskal,
+    get_minimum_spanning_tree_kruskal,
 )
 from spacja.graph_builder import GraphBuilder as gb
 from spacja.helper_structures import Edge
@@ -75,20 +75,20 @@ class TestAlgorithms:
 
     @pytest.mark.parametrize("graph, center", GRAPHS_WITH_CENTERS)
     def test_get_graph_center(self, graph, center):
-        g = SimpleGraph().fill_from_adjacency_matrix(graph)
+        g = SimpleGraph().from_adjacency_matrix(graph)
         assert get_graph_center(g) == center
 
     @pytest.mark.parametrize("graph, minimax_center", GRAPHS_WITH_MINIMAX_CENTERS)
     def test_minimax_get_graph_center(self, graph, minimax_center):
-        g = SimpleGraph().fill_from_adjacency_matrix(graph)
+        g = SimpleGraph().from_adjacency_matrix(graph)
         assert get_minimax_graph_center(g) == minimax_center
 
-    def test_get_minimal_spanning_tree_kruskal(self):
+    def test_get_minimum_spanning_tree_kruskal(self):
         g = gb.get_random_connected_graph()
-        mst1 = get_minimal_spanning_tree_kruskal(g)
+        mst1 = get_minimum_spanning_tree_kruskal(g)
         assert all(node in mst1.nodes for node in g.nodes)
 
-        mst2 = get_minimal_spanning_tree_kruskal(g)
+        mst2 = get_minimum_spanning_tree_kruskal(g)
         assert all(node in mst1.nodes for node in g.nodes)
 
         sum_g = sum(edge.weight for edge in g.edges)

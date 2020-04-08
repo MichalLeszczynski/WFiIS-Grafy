@@ -19,9 +19,6 @@ class Edge:
     def __hash__(self) -> Any:
         return hash(str(self))
 
-    def __repr__(self):
-        return self.__str__()
-
     def sort(self) -> None:  # tylko do grafów prostych!
         if self.begin > self.end:
             self.begin, self.end = self.end, self.begin

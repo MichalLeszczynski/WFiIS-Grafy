@@ -33,7 +33,7 @@ class Graph(ABC):
 
     def __str__(self) -> str:
         s = ""
-        for k, v in self.to_adjacency_list().items():
+        for k, v in sorted(self.to_adjacency_list().items()):
             s += f"{k}: {v}\n"
         return s
 
@@ -46,26 +46,27 @@ class Graph(ABC):
 
     @abstractmethod
     def get_all_possible_edges(self) -> Set[Edge]:
-        """Returns edges that are all possible moves from edge.begin to edge.end
-            Especially usable in simple graphs
+        """
+        Returns edges that are all possible moves from edge.begin to edge.end
+        Especially usable in simple graphs
         """
 
     def node_neighbours(self, node: Node) -> Set[Node]:
-        """Returns Nodes adjecent to a given node """
+        """Returns nodes adjacent to a given node"""
         return set([edge.end for edge in self.node_edges(node)])
 
     def node_edges(self, node: Node) -> Set[Edge]:
-        """Returns set of edges adjacent to the given node """
+        """Returns set of edges adjacent to the given node"""
         return set(
             [edge for edge in self.get_all_possible_edges() if edge.begin == node]
         )
 
     def node_degree(self, node: Node) -> int:
-        """Returns degree of a selected node """
+        """Returns degree of the selected node"""
         return len(self.node_edges(node))
 
     def edge_to_node(self, begin: Node, end: Node) -> Edge:
-        """Get edge that connects given two nodes """
+        """Get edge that connects given two nodes"""
         edge = [
             e
             for e in self.get_all_possible_edges()
@@ -111,24 +112,24 @@ class Graph(ABC):
     def to_incidence_matrix(self) -> IncidenceMatrix:
         """Zwraca graf w postaci macierzy incydencji"""
 
-    def fill_from_adjacency_list(self, adj_l: AdjacencyList) -> Graph:
-        """Wypełnianie grafu z lsity sąsiedztwa"""
+    def from_adjacency_list(self, adjacency_list: AdjacencyList) -> Graph:
+        """Wypełnianie grafu z listy sąsiedztwa"""
         self.clear()
 
-        size = len(adj_l)
+        size = len(adjacency_list)
         self.add_nodes(size)
 
-        for node, neighbours in adj_l.items():
+        for node, neighbours in adjacency_list.items():
             for neighbour in neighbours:
                 self.connect(node, neighbour)
         return self
 
     @abstractmethod
-    def fill_from_adjacency_matrix(self, adj_m: AdjacencyMatrix) -> Graph:
+    def from_adjacency_matrix(self, adj_m: AdjacencyMatrix) -> Graph:
         """Wypełnianie grafu z macierzy sąsiedztwa"""
 
     @abstractmethod
-    def fill_from_incidence_matrix(self, inc_m: IncidenceMatrix) -> Graph:
+    def from_incidence_matrix(self, inc_m: IncidenceMatrix) -> Graph:
         """Wypełnianie grafu z macierzy incydencji"""
 
     def save(
@@ -146,15 +147,17 @@ class Graph(ABC):
         if file_format == "al":
             filename += ".al"
             with open(filename, "w") as f:
-                f.write(self.to_adjacency_list().__str__())
+                f.write(str(self.to_adjacency_list()))
+
         elif file_format == "am":
             filename += ".am"
             with open(filename, "w") as f:
-                f.write(self.to_adjacency_matrix().__str__())
+                f.write(str(self.to_adjacency_matrix()))
+
         elif file_format == "im":
             filename += ".im"
             with open(filename, "w") as f:
-                f.write(self.to_incidence_matrix().__str__())
+                f.write(str(self.to_incidence_matrix()))
 
         elif file_format == "gv":
             with open(f"{filename}.{file_format}", "w") as f:
@@ -185,16 +188,15 @@ class Graph(ABC):
 
     def load(self, filename: str) -> None:
         """Wczytaj graf z pliku w formacie .al, .am lub .im"""
-        print('Wczytywanie grafu z pliku "{}"'.format(filename))
 
         with open(filename, "r") as f:
             data = eval(f.read())
             if filename.endswith(".al"):
-                self.fill_from_adjacency_list(data)
+                self.from_adjacency_list(data)
             elif filename.endswith(".am"):
-                self.fill_from_adjacency_matrix(data)
+                self.from_adjacency_matrix(data)
             elif filename.endswith(".im"):
-                self.fill_from_incidence_matrix(data)
+                self.from_incidence_matrix(data)
 
     def add_random_edges(self, count: int = 1) -> None:
         """Tworzy określoną ilość losowych krawędzi"""
@@ -247,15 +249,24 @@ class Graph(ABC):
                 comp[u] = nr
                 self.components_r(nr, u, comp, g)
 
-    def largest_component(self) -> List[int]:
-        """Zwraca największą spójną składową"""
+    def component_list(self):
+        """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
         comp = self.components()
-        comp_list: List[List[int]] = [[] for _ in range(max(comp.values()))]
+        components = {}
         for v, c in comp.items():
-            comp_list[c - 1].append(v)
-        return max(comp_list, key=len)
+            if c in components:
+                components[c].append(v)
+            else:
+                components[c] = [v]
+        for v in components.values():
+            v.sort()
+        return components
 
-    def fill_from_graph_sequence(self, seq: List[int]) -> Graph:
+    def largest_component(self):
+        """Zwraca największą spójną składową"""
+        return max(self.component_list().items(), key=lambda t: len(t[1]))
+
+    def from_graph_sequence(self, seq: List[int]) -> Graph:
         """Tworzenie grafu z ciągu graficznego"""
         if is_valid_graph_sequence(seq):
             self.clear()
@@ -293,11 +304,9 @@ class Graph(ABC):
 
     def is_connected_graph(self) -> bool:
         """Czy jest to graf spójny"""
-        comp = self.components()
-        for v in comp.values():
-            if v != 1:
-                return False
-        return True
+        if len(self.component_list()) == 1:
+            return True
+        return False
 
     def is_eulerian(self) -> bool:
         """Czy jest to graf Eulerowski"""
@@ -309,6 +318,6 @@ class Graph(ABC):
         else:
             return False
 
-    def give_random_weights(self, max_weight=10):
+    def assign_random_weights(self, max_weight=10):
         for edge in self.edges:
             edge.weight = random.randint(1, max_weight)

@@ -7,8 +7,10 @@ class GraphBuilder:
     """Tworzy różne rodzaje grafów"""
 
     @staticmethod
-    def get_eulerian_graph(size):
+    def get_eulerian_graph(size=None):
         """Losowy graf Eulerowski"""
+        if size is None:
+            size = random.randint(2, 16)
         while True:
             seq = []
             for d in range(size):
@@ -17,7 +19,7 @@ class GraphBuilder:
             if is_valid_graph_sequence(seq):
                 break
 
-        g = SimpleGraph().fill_from_graph_sequence(seq)
+        g = SimpleGraph().from_graph_sequence(seq)
         while True:
             if g.is_connected_graph():
                 break
@@ -28,10 +30,10 @@ class GraphBuilder:
     def get_k_regular_graph(size, k, connected=False):
         """Graf z wierzchołkami o tym samym stopniu"""
         seq = [k for _ in range(size)]
-        g = SimpleGraph().fill_from_graph_sequence(seq)
+        g = SimpleGraph().from_graph_sequence(seq)
         if connected:
-            if k < 2:
-                raise ValueError("Twój argument jest inwalidą.")
+            if k < 2 and size != 2:
+                raise ValueError("Nie da się stworzyć zadanego grafu.")
             while True:
                 if g.is_connected_graph():
                     break
@@ -58,12 +60,12 @@ class GraphBuilder:
     def get_random_weighted_graph(max_size=20):
         """Losowy graf"""
         g = GraphBuilder.get_random_graph(max_size)
-        g.give_random_weights()
+        g.assign_random_weights()
         return g
 
     @staticmethod
     def get_random_weighted_connected_graph(max_size=20):
         """Losowy graf"""
         g = GraphBuilder.get_random_connected_graph(max_size)
-        g.give_random_weights()
+        g.assign_random_weights()
         return g

@@ -6,6 +6,7 @@ Weight = int
 Matrix = List[List[int]]
 Node = int
 
+
 @dataclass
 class Edge:
     begin: Node

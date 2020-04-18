@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import os
+import random
+import itertools
+import copy
 from typing import Set, Union
 
 from spacja.graph import (
@@ -18,13 +21,12 @@ class DirectedGraph(Graph):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.separator = "->"
+        self.name = "digraph"
 
     def get_all_possible_edges(self) -> Set[Edge]:
         return self.edges
 
-    def connect(
-        self, node1: Node, node2: Node, weight: Weight = 1
-    ) -> None:
+    def connect(self, node1: Node, node2: Node, weight: Weight = 1) -> None:
         """Tworzy krawędż między wierzchołkiem node1 a node2"""
 
         if node1 not in self.nodes or node2 not in self.nodes:
@@ -109,3 +111,67 @@ class DirectedGraph(Graph):
             # mapowanie numerów wierzchołków: n-1 -> n
             self.connect(begin + 1, end + 1, weight=weight)
         return self
+
+    def components(self) -> Dict[int, int]:
+        """Zwraca słownik złożony z wierzchołków i spójnych składowych do których należą (przy pomocy algorytmu kosaraju)"""
+        g = self.to_adjacency_list()
+
+        d = {v: -1 for v in g}
+        f = {v: -1 for v in g}
+        t = 0
+
+        for v in g:
+            if d[v] == -1:
+                t = self.dfs_visit(v, g, d, f, t)
+
+        g_t = self.transposed().to_adjacency_list()
+
+        nr = 0  # nr spójnej składowej
+        comp = {v: -1 for v in g_t}
+        for v in sorted(g_t, key=lambda x: f[x], reverse=True):
+            if comp[v] == -1:
+                nr += 1
+                comp[v] = nr
+                self.components_r(nr, v, comp, g_t)
+        return comp
+
+    def dfs_visit(
+        self, v: Node, g: AdjacencyList, d: Dict[Node, int], f: Dict[Node, int], t: int
+    ) -> int:
+        t += 1
+        d[v] = t
+        for u in g[v]:
+            if d[u] == -1:
+                t = self.dfs_visit(u, g, d, f, t)
+        t += 1
+        f[v] = t
+        return t
+
+    def component_list(self) -> Dict[int, List[int]]:
+        """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
+        comp = self.components()
+        components = {}
+        for v, c in comp.items():
+            if c in components:
+                components[c].append(v)
+            else:
+                components[c] = [v]
+        for v in components.values():
+            v.sort()
+        return components
+
+    def transposed(self) -> DirectedGraph:
+        g_t = copy.deepcopy(self)
+        for edge in g_t.edges:
+            edge.begin, edge.end = edge.end, edge.begin
+        return g_t
+
+    def connect_random(self, p: int):
+        """
+        Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
+        między dowolnymi dwoma wierzchołkami wynosiło p
+        iteracja po każdej kombinacji bez powtórzeń 2 wierzchołków
+        """
+        for n1, n2 in itertools.product(self.nodes, repeat=2):
+            if random.random() < p and n1 != n2:
+                self.connect(n1, n2)

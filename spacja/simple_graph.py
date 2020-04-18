@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import random
+import itertools
 from typing import Set
 
 from spacja.graph import (
@@ -18,6 +20,7 @@ class SimpleGraph(Graph):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.separator = "--"
+        self.name = "graph"
 
     def get_all_possible_edges(self) -> Set[Edge]:
         all_possible = set()
@@ -27,9 +30,7 @@ class SimpleGraph(Graph):
         )
         return all_possible
 
-    def connect(
-        self, node1: Node, node2: Node, weight: Weight = 1
-    ) -> None:
+    def connect(self, node1: Node, node2: Node, weight: Weight = 1) -> None:
         """Tworzy krawędż między wierzchołkiem node1 a node2"""
 
         if node1 not in self.nodes or node2 not in self.nodes:
@@ -115,7 +116,41 @@ class SimpleGraph(Graph):
                     edge_nodes.append(n)
                     weight = inc_m[n][i]
             # mapowanie numerów wierzchołków: n-1 -> n
-            self.connect(
-                edge_nodes[0] + 1, edge_nodes[1] + 1, weight=weight
-            )
+            self.connect(edge_nodes[0] + 1, edge_nodes[1] + 1, weight=weight)
         return self
+
+    def components(self) -> Dict[int, int]:
+        """Zwraca słownik złożony z wierzchołków i spójnych składowych do których należą"""
+        g = self.to_adjacency_list()
+
+        nr = 0  # nr spójnej składowej
+        comp = {v: -1 for v in g}
+        for v in g:
+            if comp[v] == -1:
+                nr += 1
+                comp[v] = nr
+                self.components_r(nr, v, comp, g)
+        return comp
+
+    def component_list(self) -> Dict[int, List[int]]:
+        """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
+        comp = self.components()
+        components = {}
+        for v, c in comp.items():
+            if c in components:
+                components[c].append(v)
+            else:
+                components[c] = [v]
+        for v in components.values():
+            v.sort()
+        return components
+
+    def connect_random(self, p: int):
+        """
+        Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
+        między dowolnymi dwoma wierzchołkami wynosiło p
+        iteracja po każdej kombinacji bez powtórzeń 2 wierzchołków
+        """
+        for n1, n2 in itertools.combinations(self.nodes, 2):
+            if random.random() < p:
+                self.connect(n1, n2)

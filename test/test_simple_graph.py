@@ -26,7 +26,7 @@ class TestSimpleGraph:
         g = SimpleGraph(8)
         n1 = 1
         n2 = 2
-        
+
         g.connect(n1, n2)
         assert g.is_connected(n1, n2)
         assert g.is_connected(n2, n1)
@@ -90,6 +90,39 @@ class TestSimpleGraph:
         before = g.to_adjacency_list()
         g.from_incidence_matrix(g.to_incidence_matrix())
         after = g.to_adjacency_list()
+
+        assert before == after
+
+    def test_adjacency_list_file(self):
+        g = SimpleGraph(8)
+        g.add_random_edges(15)
+
+        before = g.to_adjacency_matrix()
+        g.save("test", "al")
+        g.load("test.al")
+        after = g.to_adjacency_matrix()
+
+        assert before == after
+
+    def test_adjacency_matrix_file(self):
+        g = SimpleGraph(8)
+        g.add_random_edges(15)
+
+        before = g.to_adjacency_matrix()
+        g.save("test", "am")
+        g.load("test.am")
+        after = g.to_adjacency_matrix()
+
+        assert before == after
+
+    def test_incidence_matrix_file(self):
+        g = SimpleGraph(8)
+        g.add_random_edges(15)
+        
+        before = g.to_adjacency_matrix()
+        g.save("test", "im")
+        g.load("test.im")
+        after = g.to_adjacency_matrix()
 
         assert before == after
 

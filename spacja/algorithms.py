@@ -2,9 +2,10 @@
 import copy
 import random
 from typing import List, Tuple, Dict
-from spacja.graph import Node
+from spacja.graph import Graph
 from spacja.simple_graph import SimpleGraph
-from spacja.helper_structures import Matrix
+from spacja.directed_graph import DirectedGraph
+from spacja.helper_structures import Matrix, Node
 
 
 def find_eulerian_trail(g) -> List[Node]:
@@ -85,13 +86,13 @@ def find_shortest_path_dijkstra(
                     distance[v] = new_distance
                     predecessors[v] = u
 
-    d = {node: int(distance[node]) for node in g.nodes}
+    d = {node: distance[node] for node in g.nodes}
     p = {node: predecessors[node] for node in g.nodes}
 
     return d, p
 
 
-def get_distances_to_nodes_matrix(g: SimpleGraph) -> Matrix:
+def get_distances_to_nodes_matrix(g: Graph) -> Matrix:
     distances_matrix = [[0 for _ in g.nodes] for _ in g.nodes]
     for node in g.nodes:
         distances, _ = find_shortest_path_dijkstra(g, node)
@@ -101,7 +102,7 @@ def get_distances_to_nodes_matrix(g: SimpleGraph) -> Matrix:
     return distances_matrix
 
 
-def get_graph_center(g: SimpleGraph) -> Node:
+def get_graph_center(g: Graph) -> Node:
     distances_matrix = get_distances_to_nodes_matrix(g)
     summary_distances = [
         sum(distances_from_node) for distances_from_node in distances_matrix
@@ -110,7 +111,7 @@ def get_graph_center(g: SimpleGraph) -> Node:
     return graph_center
 
 
-def get_minimax_graph_center(g: SimpleGraph) -> Node:
+def get_minimax_graph_center(g: Graph) -> Node:
     distances_matrix = get_distances_to_nodes_matrix(g)
     max_distances = [
         max(distances_from_node) for distances_from_node in distances_matrix
@@ -138,3 +139,74 @@ def get_minimum_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
         if comps[current_edge.begin] != comps[current_edge.end]:
             mst.edges.add(current_edge)
     return mst
+
+
+def find_shortest_path_bellman_ford(
+    g: DirectedGraph, source: Node
+) -> Tuple[Dict[Node, int], Dict[Node, Node]]:
+    """ Przyjmuje graf i zrodlo (wierzcholek).
+        Zwraca:
+        - slownik odleglosci od zrodla
+        - slownik poprzednikow 
+    """
+    predecessors = {}
+    distance = {}
+
+    for node in g.nodes:
+        distance[node] = float("inf")
+        predecessors[node] = None
+    distance[source] = 0
+
+    for i in range(1, len(g)):
+        for edge in g.edges:
+            u = edge.begin
+            v = edge.end
+            new_distance = distance[u] + g.edge_to_node(u, v).weight
+            old_distance = distance[v]
+            if new_distance < old_distance:
+                distance[v] = new_distance
+                predecessors[v] = u
+
+    # sprawdz, czy nie ma cykli o ujemnych wagach:
+    for edge in g.edges:
+        u = edge.begin
+        v = edge.end
+        if distance[v] > distance[u] + g.edge_to_node(u, v).weight:
+            print("Wystepuje cykl o ujemnych wagach.")
+            import sys
+
+            sys.exit(-1)
+
+    d = {node: int(distance[node]) for node in g.nodes}
+    p = {node: predecessors[node] for node in g.nodes}
+
+    return d, p
+
+
+def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
+
+    # dodaj wierzchołek s na potrzeby algorytmu
+    g_p = copy.deepcopy(g)
+    g_p.add_nodes()
+    s = max(g_p.nodes)
+    for node in g.nodes:
+        g_p.connect(s, node, weight=0)
+
+    # sprawdź, czy nie ma cyklów o ujemnej sumie wag
+    d, p = find_shortest_path_bellman_ford(g_p, s)
+
+    h = {}
+    from pprint import pprint
+
+    for v in g_p.nodes:
+        h[v] = d[v]
+    w = set()
+    for edge in g_p.edges:
+        edge.weight = edge.weight + h[edge.begin] - h[edge.end]
+
+    distances_matrix = [[0 for _ in g.nodes] for _ in g.nodes]
+    for u in g.nodes:
+        distances, _ = find_shortest_path_dijkstra(g_p, u)
+        for v in g.nodes:
+            distances_matrix[u - 1][v - 1] = distances[v] - h[u] + h[v]
+    return distances_matrix

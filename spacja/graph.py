@@ -19,6 +19,7 @@ class Graph(ABC):
         self.nodes: Set[Node] = set()
         self.edges: Set[Edge] = set()
         self.separator = ""
+        self.name = ""
 
         self.clear()
         self.add_nodes(count=size)
@@ -75,9 +76,7 @@ class Graph(ABC):
         return edge
 
     @abstractmethod
-    def connect(
-        self, node1: Node, node2: Node, weight: Weight = 1
-    ) -> None:
+    def connect(self, node1: Node, node2: Node, weight: Weight = 1) -> None:
         """Tworzy krawędż między wierzchołkiem node1 a node2"""
 
     @abstractmethod
@@ -161,7 +160,8 @@ class Graph(ABC):
 
         elif file_format == "gv":
             with open(f"{filename}.{file_format}", "w") as f:
-                f.write("graph g {\n")
+                f.write(self.name)
+                f.write(" g {\n")
                 for edge in self.edges:
                     label = (
                         f'[label="{edge.weight}",weight="{edge.weight}"]'
@@ -170,7 +170,7 @@ class Graph(ABC):
                     )
                     n1 = edge.begin
                     n2 = edge.end
-                    f.write(f"{n1} {self.separator} {n2}{label}\n")
+                    f.write(f"{n1} {self.separator} {n2}{label};\n")
                 connected_nodes = [edge.begin for edge in self.get_all_possible_edges()]
                 not_connected_nodes = [
                     node for node in self.nodes if node not in connected_nodes
@@ -184,7 +184,7 @@ class Graph(ABC):
             self.save(filename, file_format="gv")
             filename += ".gv"
             os.system(f"dot -T png -K {engine} -O {filename}")
-            os.system(f"rm {filename}")
+            # os.system(f"rm {filename}")
 
     def load(self, filename: str) -> None:
         """Wczytaj graf z pliku w formacie .al, .am lub .im"""
@@ -213,32 +213,21 @@ class Graph(ABC):
                 self.connect(n1, n2)
                 c += 1
 
+    @abstractmethod
     def connect_random(self, p: int):
         """
         Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
         między dowolnymi dwoma wierzchołkami wynosiło p
         iteracja po każdej kombinacji bez powtórzeń 2 wierzchołków
         """
-        for n1, n2 in itertools.combinations(self.nodes, 2):
-            if random.random() < p:
-                self.connect(n1, n2)
 
     def graph_sequence(self) -> List[int]:
         """Zwraca ciąg graficzny"""
         return sorted([len(v) for v in self.to_adjacency_list().values()], reverse=True)
 
+    @abstractmethod
     def components(self) -> Dict[int, int]:
         """Zwraca słownik złożony z wierzchołków i spójnych składowych do których należą"""
-        g = self.to_adjacency_list()
-
-        nr = 0  # nr spójnej składowej
-        comp = {v: -1 for v in g}
-        for v in g:
-            if comp[v] == -1:
-                nr += 1
-                comp[v] = nr
-                self.components_r(nr, v, comp, g)
-        return comp
 
     def components_r(
         self, nr: int, v: int, comp: Dict[int, int], g: AdjacencyList
@@ -249,18 +238,9 @@ class Graph(ABC):
                 comp[u] = nr
                 self.components_r(nr, u, comp, g)
 
-    def component_list(self):
+    @abstractmethod
+    def component_list(self) -> Dict[int, List[Node]]:
         """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
-        comp = self.components()
-        components = {}
-        for v, c in comp.items():
-            if c in components:
-                components[c].append(v)
-            else:
-                components[c] = [v]
-        for v in components.values():
-            v.sort()
-        return components
 
     def largest_component(self):
         """Zwraca największą spójną składową"""
@@ -318,6 +298,6 @@ class Graph(ABC):
         else:
             return False
 
-    def assign_random_weights(self, max_weight=10):
+    def assign_random_weights(self, min_weight=1, max_weight=10):
         for edge in self.edges:
-            edge.weight = random.randint(1, max_weight)
+            edge.weight = random.randint(min_weight, max_weight)

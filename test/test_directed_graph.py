@@ -77,7 +77,7 @@ class TestDirectedGraph:
     def test_incidence_matrix_file(self):
         g = DirectedGraph(8)
         g.add_random_edges(15)
-        
+
         before = g.to_adjacency_matrix()
         g.save("test", "im")
         g.load("test.im")

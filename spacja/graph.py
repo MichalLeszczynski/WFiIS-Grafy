@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 import json
 from spacja.helper_structures import Node, Edge, Weight
 from spacja.functions import is_valid_graph_sequence  # type: ignore
+from spacja.colors import colors
 
 AdjacencyList = Dict[int, Set[int]]
 AdjacencyMatrix = List[List[int]]
@@ -132,16 +133,21 @@ class Graph(ABC):
         """Wypełnianie grafu z macierzy incydencji"""
 
     def save(
-        self, filename: str, file_format: str = "am", engine: str = "circo"
+        self,
+        filename: str,
+        file_format: str = "am",
+        engine: str = "circo",
+        color_components: bool = False,
     ) -> None:
         """Zapisz graf w różnych formatach
-            al - lista sąsiedztwa
-            am - macierz sąsiedztwa
-            im - macierz incydencji
-            gv - dot format
-            png - plik graficzny http://www.graphviz.org/
-                engine = dot, neato, circo ...
-            PROTIP: black fajnie formatuje .al, .am i .im 
+            file_format:
+                al - lista sąsiedztwa
+                am - macierz sąsiedztwa
+                im - macierz incydencji
+                gv - dot format
+                png - plik graficzny http://www.graphviz.org/
+            engine:
+                dot, neato, circo ...
         """
         if file_format == "al":
             filename += ".al"
@@ -160,8 +166,28 @@ class Graph(ABC):
 
         elif file_format == "gv":
             with open(f"{filename}.{file_format}", "w") as f:
+                # header
                 f.write(self.name)
                 f.write(" g {\n")
+
+                # colored nodes
+                if color_components:
+                    comp_list = self.component_list()
+                    color_iter = iter(colors)
+                    for nodes in comp_list.values():
+                        color = colors[next(color_iter)]
+                        for node in nodes:
+                            f.write(f'{node} [style=filled, color="{color}80"];\n')
+
+                # detached nodes
+                connected_nodes = [edge.begin for edge in self.get_all_possible_edges()]
+                detached_nodes = [
+                    node for node in self.nodes if node not in connected_nodes
+                ]
+                for node in detached_nodes:
+                    f.write(f"{node}\n")
+
+                # edges
                 for edge in self.edges:
                     label = (
                         f'[label="{edge.weight}",weight="{edge.weight}"]'
@@ -171,17 +197,11 @@ class Graph(ABC):
                     n1 = edge.begin
                     n2 = edge.end
                     f.write(f"{n1} {self.separator} {n2}{label};\n")
-                connected_nodes = [edge.begin for edge in self.get_all_possible_edges()]
-                not_connected_nodes = [
-                    node for node in self.nodes if node not in connected_nodes
-                ]
-                for node in not_connected_nodes:
-                    f.write(f"{node}\n")
 
                 f.write("}\n")
 
         elif file_format == "png":
-            self.save(filename, file_format="gv")
+            self.save(filename, file_format="gv", color_components=color_components)
             filename += ".gv"
             os.system(f"dot -T png -K {engine} -O {filename}")
             # os.system(f"rm {filename}")
@@ -284,9 +304,7 @@ class Graph(ABC):
 
     def is_connected_graph(self) -> bool:
         """Czy jest to graf spójny"""
-        if len(self.component_list()) == 1:
-            return True
-        return False
+        return len(self.component_list()) == 1
 
     def is_eulerian(self) -> bool:
         """Czy jest to graf Eulerowski"""

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""./lab02.py [numer przykładu]"""
 
 import sys
 from pprint import pprint
@@ -31,7 +32,7 @@ def example02():
 def example03():
     """Największa wspólna składowa"""
     g = SimpleGraph().from_graph_sequence([4, 3, 3, 2, 2, 1, 1])
-    g.save(filename="graph3", file_format="png")
+    g.save(filename="graph3", file_format="png", color_components=True)
     pprint(g.component_list())
     print(f"Największa składowa: {g.largest_component()}")
 

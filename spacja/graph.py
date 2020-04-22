@@ -204,7 +204,7 @@ class Graph(ABC):
             self.save(filename, file_format="gv", color_components=color_components)
             filename += ".gv"
             os.system(f"dot -T png -K {engine} -O {filename}")
-            # os.system(f"rm {filename}")
+            os.system(f"rm {filename}")
 
     def load(self, filename: str) -> None:
         """Wczytaj graf z pliku w formacie .al, .am lub .im"""

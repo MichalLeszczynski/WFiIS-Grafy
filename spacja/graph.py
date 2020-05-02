@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import random
 import os
-from typing import Set, Dict, List, Any
+from typing import Set, Dict, List, Mapping, Any
 from abc import ABC, abstractmethod
 import json
 from spacja.helper_structures import Node, Edge, Weight
@@ -138,6 +138,7 @@ class Graph(ABC):
         file_format: str = "am",
         engine: str = "circo",
         color_components: bool = False,
+        edge_labels: Mapping[Tuple[Node, Node], str] = None
     ) -> None:
         """Zapisz graf w różnych formatach
             file_format:
@@ -188,20 +189,24 @@ class Graph(ABC):
                     f.write(f"{node}\n")
 
                 # edges
+                print(edge_labels)
+                if edge_labels is None:
+                    edge_labels = {}
+
                 for edge in self.edges:
+                    n1 = edge.begin
+                    n2 = edge.end
                     label = (
-                        f'[label="{edge.weight}",weight="{edge.weight}"]'
+                        f'[label="{edge.weight if (n1, n2) not in edge_labels else edge_labels[(n1, n2)]}",weight="{edge.weight}"]'
                         if self.is_weighted_graph()
                         else ""
                     )
-                    n1 = edge.begin
-                    n2 = edge.end
                     f.write(f"{n1} {self.separator} {n2}{label};\n")
 
                 f.write("}\n")
 
         elif file_format == "png":
-            self.save(filename, file_format="gv", color_components=color_components)
+            self.save(filename, file_format="gv", color_components=color_components, edge_labels=edge_labels)
             filename += ".gv"
             os.system(f"dot -T png -K {engine} -O {filename}")
             os.system(f"rm {filename}")

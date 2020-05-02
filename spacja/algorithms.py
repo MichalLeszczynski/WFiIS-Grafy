@@ -1,7 +1,10 @@
 """Algorytmy działające na grafach"""
 import copy
+import collections
+import math
 import random
 from typing import List, Tuple, Dict
+
 from spacja.graph import Graph
 from spacja.simple_graph import SimpleGraph
 from spacja.directed_graph import DirectedGraph
@@ -62,7 +65,7 @@ def find_shortest_path_dijkstra(
     """ Przyjmuje graf i zrodlo (wierzcholek).
         Zwraca:
         - slownik odleglosci od zrodla
-        - slownik poprzednikow 
+        - slownik poprzednikow
     """
 
     predecessors = {}
@@ -121,7 +124,7 @@ def get_minimax_graph_center(g: Graph) -> Node:
 
 
 def get_minimum_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
-    """ 
+    """
     Przyjmuje graf
     Zwraca jego minimalne drzewo rozpinające
     Korzysta z algorytmu kruskala
@@ -147,7 +150,7 @@ def find_shortest_path_bellman_ford(
     """ Przyjmuje graf i zrodlo (wierzcholek).
         Zwraca:
         - slownik odleglosci od zrodla
-        - slownik poprzednikow 
+        - slownik poprzednikow
     """
     predecessors = {}
     distance = {}
@@ -210,3 +213,28 @@ def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
         for v in g.nodes:
             distances_matrix[u - 1][v - 1] = distances[v] - h[u] + h[v]
     return distances_matrix
+
+
+def breadth_first_search(
+    g: Graph, source: Node, target: Node = None
+) -> Dict[Node, Node]:
+    """Przeszukiwanie wszerz. Na podstawie alg_5.pdf"""
+    # tablica odległości
+    d = {n: math.inf for n in g.nodes}
+    d[source] = 0
+    # tablica poprzedników
+    p = {n: None for n in g.nodes}
+
+    q = collections.deque()
+    q.append(source)
+
+    while q:
+        v = q.popleft()
+        for u in g.node_neighbours(v):
+            if d[u] == math.inf:
+                d[u] = d[v] + 1
+                p[u] = v
+                q.append(u)
+                if u == target:
+                    break
+    return p

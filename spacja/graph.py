@@ -138,7 +138,7 @@ class Graph(ABC):
         file_format: str = "am",
         engine: str = "circo",
         color_components: bool = False,
-        edge_labels: Mapping[Tuple[Node, Node], str] = None
+        edge_labels: Mapping[Tuple[Node, Node], str] = None,
     ) -> None:
         """Zapisz graf w różnych formatach
             file_format:
@@ -206,7 +206,12 @@ class Graph(ABC):
                 f.write("}\n")
 
         elif file_format == "png":
-            self.save(filename, file_format="gv", color_components=color_components, edge_labels=edge_labels)
+            self.save(
+                filename,
+                file_format="gv",
+                color_components=color_components,
+                edge_labels=edge_labels,
+            )
             filename += ".gv"
             os.system(f"dot -T png -K {engine} -O {filename}")
             os.system(f"rm {filename}")

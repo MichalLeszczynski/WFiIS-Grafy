@@ -81,7 +81,7 @@ class GraphBuilder:
         """
         assert N >= 2
 
-        print(f'liczba warstw: {N}')
+        print(f"liczba warstw: {N}")
 
         # krok 1: tworzenie warstw
         node_count_in_layer = [1] + [random.randint(2, N) for _ in range(N)] + [1]
@@ -116,13 +116,10 @@ class GraphBuilder:
             n1 = random.randint(1, len(g) - 1)
             # brak krawędzi wchodzącej do źródła
             n2 = random.randint(2, len(g))
-            print('wylosowano krawędź {} -> {}'.format(n1, n2))
             if n1 == n2 or g.is_connected(n1, n2) or g.is_connected(n2, n1):
-                print('odrzucono')
                 continue
             g.connect(n1, n2)
             edges_added += 1
-            print('połączono')
         # krok 4: przypisanie każdej krawędzi losowej przepustowości
         g.assign_random_weights()
 

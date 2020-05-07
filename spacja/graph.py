@@ -189,7 +189,6 @@ class Graph(ABC):
                     f.write(f"{node}\n")
 
                 # edges
-                print(edge_labels)
                 if edge_labels is None:
                     edge_labels = {}
 

@@ -10,7 +10,9 @@ from spacja.algorithms import (
     get_minimax_graph_center,
     get_minimum_spanning_tree_kruskal,
     breadth_first_search,
+    ford_fulkerson,
 )
+from spacja.directed_graph import DirectedGraph
 from spacja.functions import get_trail_to_node
 from spacja.graph_builder import GraphBuilder as gb
 from spacja.helper_structures import Edge
@@ -120,3 +122,27 @@ class TestAlgorithms:
         g = SimpleGraph().from_adjacency_list(graph)
         tr = get_trail_to_node(breadth_first_search(g, source, target), target)
         assert tr == trail
+
+    FF_G1 = [
+        [0, 10, 3, 6, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 8, 0, 8, 6, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 2, 10, 0, 0, 0, 0],
+        [0, 0, 0, 0, 9, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 7, 0],
+        [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+
+    FF_GRAPH_F_MAX = [(FF_G1, 19)]
+
+    @pytest.mark.parametrize("graph, f_max", FF_GRAPH_F_MAX)
+    def test_ford_fulkerson(self, graph, f_max):
+        g = DirectedGraph().from_adjacency_matrix(graph)
+        f = ford_fulkerson(g)
+
+        gf_max = sum(weight for ((begin, end), weight) in f.items() if begin == 1)
+        assert gf_max == f_max

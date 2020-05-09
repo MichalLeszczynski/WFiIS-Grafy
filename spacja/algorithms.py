@@ -1,7 +1,11 @@
 """Algorytmy działające na grafach"""
 import copy
+import collections
+import math
 import random
 from typing import List, Tuple, Dict
+
+from spacja.functions import get_trail_to_node
 from spacja.graph import Graph
 from spacja.simple_graph import SimpleGraph
 from spacja.directed_graph import DirectedGraph
@@ -62,7 +66,7 @@ def find_shortest_path_dijkstra(
     """ Przyjmuje graf i zrodlo (wierzcholek).
         Zwraca:
         - slownik odleglosci od zrodla
-        - slownik poprzednikow 
+        - slownik poprzednikow
     """
 
     predecessors = {}
@@ -121,7 +125,7 @@ def get_minimax_graph_center(g: Graph) -> Node:
 
 
 def get_minimum_spanning_tree_kruskal(g: SimpleGraph) -> SimpleGraph:
-    """ 
+    """
     Przyjmuje graf
     Zwraca jego minimalne drzewo rozpinające
     Korzysta z algorytmu kruskala
@@ -147,7 +151,7 @@ def find_shortest_path_bellman_ford(
     """ Przyjmuje graf i zrodlo (wierzcholek).
         Zwraca:
         - slownik odleglosci od zrodla
-        - slownik poprzednikow 
+        - slownik poprzednikow
     """
     predecessors = {}
     distance = {}
@@ -210,3 +214,75 @@ def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
         for v in g.nodes:
             distances_matrix[u - 1][v - 1] = distances[v] - h[u] + h[v]
     return distances_matrix
+
+
+def breadth_first_search(
+    g: Graph, source: Node, target: Node = None
+) -> Dict[Node, Node]:
+    """Przeszukiwanie wszerz. Na podstawie alg_5.pdf"""
+    # tablica odległości
+    d = {n: math.inf for n in g.nodes}
+    d[source] = 0
+    # tablica poprzedników
+    p = {n: None for n in g.nodes}
+
+    q = collections.deque()
+    q.append(source)
+
+    while q:
+        v = q.popleft()
+        for u in g.node_neighbours(v):
+            if d[u] == math.inf:
+                d[u] = d[v] + 1
+                p[u] = v
+                q.append(u)
+                if u == target:
+                    break
+    return p
+
+
+def ford_fulkerson(g: DirectedGraph, verbose: bool = False):
+    """Edmonds–Karp implementation"""
+    # sieć rezydualna
+    gf = copy.deepcopy(g)
+    # źródło
+    s: Node = 1
+    # ujście
+    t: Node = len(g)
+    # przepływ krawędzi
+    f = {(e.begin, e.end): 0 for e in g.edges}
+
+    step = 0
+
+    while True:
+        p = get_trail_to_node(breadth_first_search(gf, s, t), t)
+        if p == [t]:
+            if verbose:
+                print("nie istnieje kolejna ścieżka rozszerzająca")
+            break
+        if verbose:
+            print(f"ścieżka rozszerzająca: {p}")
+        p_edges = [gf.edge_to_node(p[i - 1], p[i]) for i in range(1, len(p))]
+        cf_p = min(e.weight for e in p_edges)
+        if verbose:
+            print(f"przepustowość rezydualna ścieżki: {cf_p}")
+        for edge in p_edges:
+            u = edge.begin
+            v = edge.end
+            if g.is_connected(u, v):
+                f[(u, v)] = f[(u, v)] + cf_p
+            else:
+                f[(v, u)] = f[(v, u)] - cf_p
+                if verbose:
+                    print(f"kasowanie przepływu, krawędź: ({u}, {v})")
+        # update residual network weights
+        gf.edges = set()
+        for u, v, c in {(e.begin, e.end, e.weight) for e in g.edges}:
+            w1 = c - f[(u, v)]
+            w2 = f[(u, v)]
+            if w1 != 0:
+                gf.connect(u, v, w1)
+            if w2 != 0:
+                gf.connect(v, u, w2)
+        step += 1
+    return f

@@ -9,7 +9,11 @@ from spacja.algorithms import (
     get_graph_center,
     get_minimax_graph_center,
     get_minimum_spanning_tree_kruskal,
+    breadth_first_search,
+    ford_fulkerson,
 )
+from spacja.directed_graph import DirectedGraph
+from spacja.functions import get_trail_to_node
 from spacja.graph_builder import GraphBuilder as gb
 from spacja.helper_structures import Edge
 from spacja.simple_graph import SimpleGraph
@@ -95,3 +99,50 @@ class TestAlgorithms:
         sum_mst1 = sum(edge.weight for edge in mst1.edges)
         sum_mst2 = sum(edge.weight for edge in mst2.edges)
         assert sum_mst1 == sum_mst2 <= sum_g
+
+    BFS_G1 = {
+        1: {2, 3},
+        2: {1, 4, 5},
+        3: {1, 6, 7},
+        4: {2},
+        5: {2, 7},
+        6: {3},
+        7: {3, 5, 8},
+        8: {7},
+    }
+    BFS_GRAPH_SOURCE_TARGET_TRAIL = [
+        (BFS_G1, 1, 8, [1, 3, 7, 8]),
+        (BFS_G1, 5, 3, [5, 7, 3]),
+    ]
+
+    @pytest.mark.parametrize(
+        "graph, source, target, trail", BFS_GRAPH_SOURCE_TARGET_TRAIL
+    )
+    def test_breadth_first_search(self, graph, source, target, trail):
+        g = SimpleGraph().from_adjacency_list(graph)
+        tr = get_trail_to_node(breadth_first_search(g, source, target), target)
+        assert tr == trail
+
+    FF_G1 = [
+        [0, 10, 3, 6, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 8, 0, 8, 6, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 2, 10, 0, 0, 0, 0],
+        [0, 0, 0, 0, 9, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 7, 0],
+        [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+
+    FF_GRAPH_F_MAX = [(FF_G1, 19)]
+
+    @pytest.mark.parametrize("graph, f_max", FF_GRAPH_F_MAX)
+    def test_ford_fulkerson(self, graph, f_max):
+        g = DirectedGraph().from_adjacency_matrix(graph)
+        f = ford_fulkerson(g)
+
+        gf_max = sum(weight for ((begin, end), weight) in f.items() if begin == 1)
+        assert gf_max == f_max

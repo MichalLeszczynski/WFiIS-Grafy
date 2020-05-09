@@ -16,7 +16,6 @@ from spacja.algorithms import (
     get_minimum_spanning_tree_kruskal,
 )
 from spacja.functions import get_all_trails_from_predecessors
- 
 
 
 def main():
@@ -57,7 +56,6 @@ def main():
 
     save_if_needed(g, args)
 
-
     print("\nDijkstra:")
     distances, predecessors = find_shortest_path_dijkstra(g, tuple(g.nodes)[0])
 
@@ -76,7 +74,7 @@ def main():
     print(f"\nCentrum grafu: {get_graph_center(g)}")
 
     print(f"\nMinimaxowe centrum grafu: {get_minimax_graph_center(g)}")
-    
+
     mst = get_minimum_spanning_tree_kruskal(g)
     print("\nMinimalne drzewo rozpinające (szukane algorytmem kruskala):")
     print(mst)

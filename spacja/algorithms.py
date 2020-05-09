@@ -3,9 +3,10 @@ import copy
 import collections
 import math
 import random
+import numpy as np
 from typing import List, Tuple, Dict
 
-from spacja.functions import get_trail_to_node
+from spacja.functions import get_trail_to_node, stopwatch
 from spacja.graph import Graph
 from spacja.simple_graph import SimpleGraph
 from spacja.directed_graph import DirectedGraph
@@ -161,7 +162,7 @@ def find_shortest_path_bellman_ford(
         predecessors[node] = None
     distance[source] = 0
 
-    for i in range(1, len(g)):
+    for _ in range(1, len(g)):
         for edge in g.edges:
             u = edge.begin
             v = edge.end
@@ -188,7 +189,6 @@ def find_shortest_path_bellman_ford(
 
 
 def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
-
     # dodaj wierzchołek s na potrzeby algorytmu
     g_p = copy.deepcopy(g)
     g_p.add_nodes()
@@ -197,14 +197,14 @@ def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
         g_p.connect(s, node, weight=0)
 
     # sprawdź, czy nie ma cyklów o ujemnej sumie wag
-    d, p = find_shortest_path_bellman_ford(g_p, s)
+    d, _ = find_shortest_path_bellman_ford(g_p, s)
 
     h = {}
     from pprint import pprint
 
     for v in g_p.nodes:
         h[v] = d[v]
-    w = set()
+
     for edge in g_p.edges:
         edge.weight = edge.weight + h[edge.begin] - h[edge.end]
 
@@ -286,3 +286,61 @@ def ford_fulkerson(g: DirectedGraph, verbose: bool = False):
                 gf.connect(v, u, w2)
         step += 1
     return f
+
+@stopwatch
+def page_rank(g, d = 0.15, algorithm = "matrix"):
+    """
+    Zwraca ranking węzłów w grafie skierowanym
+    d - prawdopodobieństwo teleportacji
+    """
+    if d < 0 or d > 1:
+        raise ValueError("Nieprawidłowa wartość dla prawdopodobieństwa")
+
+    if g.has_dangling_nodes():
+        raise ValueError("Nieprawidłowy graf: posiada wierzchołki bez krawędzi wyjściowych.")
+
+    if algorithm=="random_walk":
+        return _page_rank_random_walk(g, d=d)
+    elif algorithm=="matrix":
+        return _page_rank_matrix(g, d=d)
+    else:
+        raise ValueError("Nieprawidłowy wybór algorytmu.")
+
+def _page_rank_random_walk(g, d):
+    adj_l = g.to_adjacency_list()
+    visited = {n:0 for n in g.nodes}
+    current_node = random.choice(list(g.nodes))
+    N = 0
+    while N < 100000:
+        if random.random() > d and len(adj_l[current_node]) != 0:
+            current_node = random.choice(list(adj_l[current_node]))
+        else:
+            current_node = random.choice(list(g.nodes))
+        
+        visited[current_node] += 1
+        N += 1
+    visited = {n:v/sum(visited.values()) for n, v in visited.items()}
+    return(visited)
+
+
+def _page_rank_matrix(g, d):
+    n = len(g.nodes)
+    P = np.zeros((n, n))
+    A = np.array(g.to_adjacency_matrix())
+    for i in range(n):
+        for j in range(n):
+            P[i][j] = (1.0 - d) * A[i][j] / g.node_degree(i+1) + d/float(n)
+    
+    p0 = np.full(n, 1/n)
+    p1 = np.zeros(n)
+    i = 0
+    err = float("inf")
+    while err > 1e-11:
+        p1 = p0.dot(P)
+        diff = p1 - p0
+        err = sum(x**2 for x in diff)
+        p0 = p1
+        i += 1
+    print(f"Zbieżność uzyskano po {i} iteracjach.")
+    return {k:p1[k-1] for k in range(1, n+1)}
+        

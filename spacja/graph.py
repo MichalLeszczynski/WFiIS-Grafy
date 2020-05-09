@@ -3,11 +3,12 @@ from __future__ import annotations
 import itertools
 import random
 import os
+import json
 from typing import Set, Dict, List, Mapping, Any
 from abc import ABC, abstractmethod
-import json
+
 from spacja.helper_structures import Node, Edge, Weight
-from spacja.functions import is_valid_graph_sequence  # type: ignore
+from spacja.functions import is_valid_graph_sequence, number_to_alpha
 from spacja.colors import colors
 
 AdjacencyList = Dict[int, Set[int]]
@@ -138,6 +139,7 @@ class Graph(ABC):
         file_format: str = "am",
         engine: str = "circo",
         color_components: bool = False,
+        alphabetical: bool = False,
         edge_labels: Mapping[Tuple[Node, Node], str] = None,
     ) -> None:
         """Zapisz graf w różnych formatach
@@ -149,6 +151,8 @@ class Graph(ABC):
                 png - plik graficzny http://www.graphviz.org/
             engine:
                 dot, neato, circo ...
+            alpha:
+                Oznacz węzły literami alfabetu
         """
         if file_format == "al":
             filename += ".al"
@@ -178,6 +182,8 @@ class Graph(ABC):
                     for nodes in comp_list.values():
                         color = colors[next(color_iter)]
                         for node in nodes:
+                            if alphabetical:
+                                node = number_to_alpha(node)
                             f.write(f'{node} [style=filled, color="{color}80"];\n')
 
                 # detached nodes
@@ -186,6 +192,8 @@ class Graph(ABC):
                     node for node in self.nodes if node not in connected_nodes
                 ]
                 for node in detached_nodes:
+                    if alphabetical:
+                        node = number_to_alpha(node)
                     f.write(f"{node}\n")
 
                 # edges
@@ -200,6 +208,9 @@ class Graph(ABC):
                         if self.is_weighted_graph()
                         else ""
                     )
+                    if alphabetical:
+                        n1 = number_to_alpha(n1)
+                        n2 = number_to_alpha(n2)
                     f.write(f"{n1} {self.separator} {n2}{label};\n")
 
                 f.write("}\n")
@@ -209,11 +220,12 @@ class Graph(ABC):
                 filename,
                 file_format="gv",
                 color_components=color_components,
+                alphabetical=alphabetical,
                 edge_labels=edge_labels,
             )
             filename += ".gv"
             os.system(f"dot -T png -K {engine} -O {filename}")
-            os.system(f"rm {filename}")
+            # os.system(f"rm {filename}")
 
     def load(self, filename: str) -> None:
         """Wczytaj graf z pliku w formacie .al, .am lub .im"""

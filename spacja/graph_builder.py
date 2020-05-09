@@ -43,7 +43,6 @@ class GraphBuilder:
 
     @staticmethod
     def get_random_graph(max_size=20):
-        """Losowy graf"""
         size = random.randint(2, max_size)
         g = SimpleGraph(size)
         g.connect_random(random.random())
@@ -51,7 +50,6 @@ class GraphBuilder:
 
     @staticmethod
     def get_random_connected_graph(max_size=20):
-        """Losowy graf spojny"""
         g = GraphBuilder.get_random_graph(max_size)
         while not g.is_connected_graph():
             g = GraphBuilder.get_random_graph(max_size)
@@ -59,16 +57,21 @@ class GraphBuilder:
 
     @staticmethod
     def get_random_weighted_graph(max_size=20):
-        """Losowy graf"""
         g = GraphBuilder.get_random_graph(max_size)
         g.assign_random_weights()
         return g
 
     @staticmethod
     def get_random_weighted_connected_graph(max_size=20):
-        """Losowy graf"""
         g = GraphBuilder.get_random_connected_graph(max_size)
         g.assign_random_weights()
+        return g
+
+    @staticmethod
+    def get_random_digraph(max_size=20):
+        size = random.randint(2, max_size)
+        g = DirectedGraph(size)
+        g.connect_random(random.random())
         return g
 
     @staticmethod

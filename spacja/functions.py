@@ -1,4 +1,6 @@
 """Pomocnicze funkcje które nie używają klasy SimpleGraph"""
+import time
+import functools
 from typing import List, Dict
 from spacja.helper_structures import Node
 
@@ -48,3 +50,23 @@ def get_trail_to_node(predecessors: Dict[Node, Node], node: Node) -> List[Node]:
     if predecessors[node] is None:
         return [node]
     return get_trail_to_node(predecessors, predecessors[node]) + [node]
+
+
+def stopwatch(fun):
+    @functools.wraps(fun)
+    def wrapper(*args, **kwargs):
+        start = time.monotonic()
+        result =  fun(*args, **kwargs)
+        end = time.monotonic()
+        debug_info = f"{fun.__name__} took {(end - start)*1000:.3f}ms"
+        print(debug_info)
+        return result
+    return wrapper
+
+
+def number_to_alpha(num):
+    if num < 1:
+        raise ValueError()
+    if num > 26:
+        return number_to_alpha(num // 26) + chr(num % 26 + ord("A") - 1)
+    return chr(num + ord("A") - 1)

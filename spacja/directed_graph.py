@@ -175,3 +175,10 @@ class DirectedGraph(Graph):
         for n1, n2 in itertools.product(self.nodes, repeat=2):
             if random.random() < p and n1 != n2:
                 self.connect(n1, n2)
+
+    def has_dangling_nodes(self):
+        adj_l = self.to_adjacency_list()
+        for s in adj_l.values():
+            if len(s) == 0:
+                return True
+        return False

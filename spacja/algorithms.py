@@ -13,7 +13,7 @@ from spacja.directed_graph import DirectedGraph
 from spacja.helper_structures import Matrix, Node
 
 
-def find_eulerian_trail(g) -> List[Node]:
+def find_eulerian_trail(g: SimpleGraph) -> List[Node]:
     """Znajduje losowy cykl Eulera w grafie"""
     if not g.is_eulerian():
         raise ValueError(f"Nie jest to graf Eulerowski\n{g}")
@@ -32,7 +32,7 @@ def find_eulerian_trail(g) -> List[Node]:
     return solution
 
 
-def find_hamiltonian_circuit(g) -> List[Node]:
+def find_hamiltonian_circuit(g: SimpleGraph) -> List[Node]:
     """Znajduje losowy cykl Hamiltona w grafie"""
     g = copy.deepcopy(g)
     if not g.is_connected_graph():
@@ -42,7 +42,7 @@ def find_hamiltonian_circuit(g) -> List[Node]:
     return solution
 
 
-def hamilton_search_r(g, stack) -> List[Node]:
+def hamilton_search_r(g: SimpleGraph, stack: List[Node]) -> List[Node]:
     # Zawiera wszystkie wierzcholki
     if set(stack) == g.nodes:
         # Istnieje połączenie między pierwszym a ostatnim
@@ -63,13 +63,12 @@ def hamilton_search_r(g, stack) -> List[Node]:
 
 def find_shortest_path_dijkstra(
     g: SimpleGraph, source: Node
-) -> Tuple[Dict[Node, int], Dict[Node, Node]]:
+) -> Tuple[Dict[int, float], Dict[int, int]]:
     """ Przyjmuje graf i zrodlo (wierzcholek).
         Zwraca:
         - slownik odleglosci od zrodla
         - slownik poprzednikow
     """
-
     predecessors = {}
     distance = {}
     # kolejka priorytetowa dla wierzchołkow grafu (klucz: aktualnie wyliczona odleglosc)
@@ -218,7 +217,7 @@ def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
 
 def breadth_first_search(
     g: Graph, source: Node, target: Node = None
-) -> Dict[Node, Node]:
+) -> Dict[int, None]:
     """Przeszukiwanie wszerz. Na podstawie alg_5.pdf"""
     # tablica odległości
     d = {n: math.inf for n in g.nodes}
@@ -241,7 +240,7 @@ def breadth_first_search(
     return p
 
 
-def ford_fulkerson(g: DirectedGraph, verbose: bool = False):
+def ford_fulkerson(g: DirectedGraph, verbose: bool = False) -> Dict[Tuple[int, int], int]:
     """Edmonds–Karp implementation"""
     # sieć rezydualna
     gf = copy.deepcopy(g)
@@ -288,7 +287,7 @@ def ford_fulkerson(g: DirectedGraph, verbose: bool = False):
     return f
 
 @stopwatch
-def page_rank(g, d = 0.15, algorithm = "matrix"):
+def page_rank(g: DirectedGraph, d = 0.15, algorithm = "matrix") -> Dict[int, float]:
     """
     Zwraca ranking węzłów w grafie skierowanym
     d - prawdopodobieństwo teleportacji
@@ -306,7 +305,7 @@ def page_rank(g, d = 0.15, algorithm = "matrix"):
     else:
         raise ValueError("Nieprawidłowy wybór algorytmu.")
 
-def _page_rank_random_walk(g, d):
+def _page_rank_random_walk(g: DirectedGraph, d) -> Dict[int, float]:
     adj_l = g.to_adjacency_list()
     visited = {n:0 for n in g.nodes}
     current_node = random.choice(list(g.nodes))
@@ -319,11 +318,10 @@ def _page_rank_random_walk(g, d):
         
         visited[current_node] += 1
         N += 1
-    visited = {n:v/sum(visited.values()) for n, v in visited.items()}
-    return(visited)
+    return {n:v/sum(visited.values()) for n, v in visited.items()}
 
 
-def _page_rank_matrix(g, d):
+def _page_rank_matrix(g: DirectedGraph, d) -> Dict[int, float]:
     n = len(g.nodes)
     P = np.zeros((n, n))
     A = np.array(g.to_adjacency_matrix())

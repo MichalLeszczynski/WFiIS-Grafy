@@ -4,20 +4,21 @@ import itertools
 import random
 import os
 import json
-from typing import Set, Dict, List, Mapping, Any
+from typing import Set, Dict, List, Tuple, Mapping, Any
 from abc import ABC, abstractmethod
 
 from spacja.helper_structures import Node, Edge, Weight
 from spacja.functions import is_valid_graph_sequence, number_to_alpha
 from spacja.colors import colors
 
-AdjacencyList = Dict[int, Set[int]]
-AdjacencyMatrix = List[List[int]]
-IncidenceMatrix = List[List[int]]
-
+from spacja.helper_structures import (
+    AdjacencyList,
+    AdjacencyMatrix,
+    IncidenceMatrix,
+)
 
 class Graph(ABC):
-    def __init__(self, size=0) -> None:
+    def __init__(self, size: int=0) -> None:
         self.nodes: Set[Node] = set()
         self.edges: Set[Edge] = set()
         self.separator = ""
@@ -26,7 +27,7 @@ class Graph(ABC):
         self.clear()
         self.add_nodes(count=size)
 
-    def add_nodes(self, count=1) -> None:
+    def add_nodes(self, count: int=1) -> None:
         """Tworzy nowe wierzchołki"""
         for i in range(len(self) + 1, len(self) + 1 + count):
             self.nodes.add(i)
@@ -255,7 +256,7 @@ class Graph(ABC):
                 c += 1
 
     @abstractmethod
-    def connect_random(self, p: int):
+    def connect_random(self, p: float) -> None:
         """
         Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
         między dowolnymi dwoma wierzchołkami wynosiło p
@@ -279,11 +280,20 @@ class Graph(ABC):
                 comp[u] = nr
                 self.components_r(nr, u, comp, g)
 
-    @abstractmethod
-    def component_list(self) -> Dict[int, List[Node]]:
+    def component_list(self) -> Dict[int, List[int]]:
         """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
+        comp = self.components()
+        components = {}
+        for v, c in comp.items():
+            if c in components:
+                components[c].append(v)
+            else:
+                components[c] = [v]
+        for vertices in components.values():
+            vertices.sort()
+        return components
 
-    def largest_component(self):
+    def largest_component(self) -> Tuple[int, List[int]]:
         """Zwraca największą spójną składową"""
         return max(self.component_list().items(), key=lambda t: len(t[1]))
 
@@ -337,6 +347,6 @@ class Graph(ABC):
         else:
             return False
 
-    def assign_random_weights(self, min_weight=1, max_weight=10):
+    def assign_random_weights(self, min_weight=1, max_weight=10) -> None:
         for edge in self.edges:
             edge.weight = random.randint(min_weight, max_weight)

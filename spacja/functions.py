@@ -5,7 +5,7 @@ from typing import List, Dict
 from spacja.helper_structures import Node
 
 
-def is_valid_graph_sequence(seq):
+def is_valid_graph_sequence(seq: List) -> bool:
     """Sprawdza czy z podanej listy da się utworzyć graf"""
     # Jeśli liczba wierzchołków o nieparzystym stopniu jest nieparzysta to nie jest to ciąg graficzny
     seq = list(seq)
@@ -64,7 +64,7 @@ def stopwatch(fun):
     return wrapper
 
 
-def number_to_alpha(num):
+def number_to_alpha(num: int) -> str:
     if num < 1:
         raise ValueError()
     if num > 26:

@@ -3,10 +3,10 @@ from __future__ import annotations
 import os
 import random
 import itertools
-from typing import Set
+from typing import Set, Dict, List
 
-from spacja.graph import (
-    Graph,
+from spacja.graph import Graph
+from spacja.helper_structures import (
     Node,
     Edge,
     Weight,
@@ -17,7 +17,7 @@ from spacja.graph import (
 
 
 class SimpleGraph(Graph):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.separator = "--"
         self.name = "graph"
@@ -132,20 +132,7 @@ class SimpleGraph(Graph):
                 self.components_r(nr, v, comp, g)
         return comp
 
-    def component_list(self) -> Dict[int, List[int]]:
-        """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
-        comp = self.components()
-        components = {}
-        for v, c in comp.items():
-            if c in components:
-                components[c].append(v)
-            else:
-                components[c] = [v]
-        for v in components.values():
-            v.sort()
-        return components
-
-    def connect_random(self, p: int):
+    def connect_random(self, p: float) -> None:
         """
         Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
         między dowolnymi dwoma wierzchołkami wynosiło p

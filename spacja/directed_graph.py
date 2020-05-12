@@ -4,10 +4,10 @@ import os
 import random
 import itertools
 import copy
-from typing import Set, Union
+from typing import Set, Union, Dict, List
 
-from spacja.graph import (
-    Graph,
+from spacja.graph import Graph
+from spacja.helper_structures import (
     Node,
     Edge,
     Weight,
@@ -18,7 +18,7 @@ from spacja.graph import (
 
 
 class DirectedGraph(Graph):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.separator = "->"
         self.name = "digraph"
@@ -28,7 +28,6 @@ class DirectedGraph(Graph):
 
     def connect(self, node1: Node, node2: Node, weight: Weight = 1) -> None:
         """Tworzy krawędż między wierzchołkiem node1 a node2"""
-
         if node1 not in self.nodes or node2 not in self.nodes:
             raise ValueError
 
@@ -38,7 +37,6 @@ class DirectedGraph(Graph):
 
     def disconnect(self, node1: Node, node2: Node) -> None:
         """Usuwa krawędż między wierzchołkiem node1 a node2"""
-
         if node1 not in self.nodes or node2 not in self.nodes or node1 == node2:
             raise ValueError
 
@@ -50,7 +48,6 @@ class DirectedGraph(Graph):
 
     def is_connected(self, node1: Node, node2: Node) -> bool:
         """Czy stnieje krawędź node1 -- node2"""
-
         return node2 in [edge.end for edge in self.edges if edge.begin == node1]
 
     def to_adjacency_matrix(self) -> AdjacencyMatrix:
@@ -147,26 +144,13 @@ class DirectedGraph(Graph):
         f[v] = t
         return t
 
-    def component_list(self) -> Dict[int, List[int]]:
-        """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
-        comp = self.components()
-        components = {}
-        for v, c in comp.items():
-            if c in components:
-                components[c].append(v)
-            else:
-                components[c] = [v]
-        for v in components.values():
-            v.sort()
-        return components
-
     def transposed(self) -> DirectedGraph:
         g_t = copy.deepcopy(self)
         for edge in g_t.edges:
             edge.begin, edge.end = edge.end, edge.begin
         return g_t
 
-    def connect_random(self, p: int):
+    def connect_random(self, p: float) -> None:
         """
         Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
         między dowolnymi dwoma wierzchołkami wynosiło p
@@ -176,7 +160,7 @@ class DirectedGraph(Graph):
             if random.random() < p and n1 != n2:
                 self.connect(n1, n2)
 
-    def has_dangling_nodes(self):
+    def has_dangling_nodes(self) -> bool:
         adj_l = self.to_adjacency_list()
         for s in adj_l.values():
             if len(s) == 0:

@@ -6,7 +6,7 @@ from pprint import pprint
 
 sys.path.insert(0, "../..")
 from spacja.simple_graph import SimpleGraph
-from spacja.graph_builder import GraphBuilder
+from spacja.graph_builder import GraphBuilder as gb
 from spacja.functions import is_valid_graph_sequence
 from spacja.algorithms import find_eulerian_trail, find_hamiltonian_circuit
 
@@ -82,7 +82,6 @@ def example06():
 
 
 if __name__ == "__main__":
-    gb = GraphBuilder()
     examples = [None, example01, example02, example03, example04, example05, example06]
     if len(sys.argv) == 2:
         example = int(sys.argv[1])

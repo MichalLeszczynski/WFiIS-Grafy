@@ -1,4 +1,6 @@
 import random
+import os
+
 from spacja.directed_graph import DirectedGraph
 from spacja.functions import is_valid_graph_sequence
 from spacja.simple_graph import SimpleGraph
@@ -8,7 +10,7 @@ class GraphBuilder:
     """Tworzy różne rodzaje grafów"""
 
     @staticmethod
-    def get_eulerian_graph(size=None):
+    def get_eulerian_graph(size: int = None) -> SimpleGraph:
         """Losowy graf Eulerowski"""
         if size is None:
             size = random.randint(2, 16)
@@ -28,7 +30,7 @@ class GraphBuilder:
         return g
 
     @staticmethod
-    def get_k_regular_graph(size, k, connected=False):
+    def get_k_regular_graph(size, k, connected=False) -> SimpleGraph:
         """Graf z wierzchołkami o tym samym stopniu"""
         seq = [k for _ in range(size)]
         g = SimpleGraph().from_graph_sequence(seq)
@@ -42,37 +44,40 @@ class GraphBuilder:
         return g
 
     @staticmethod
-    def get_random_graph(max_size=20):
-        """Losowy graf"""
+    def get_random_graph(max_size=20) -> SimpleGraph:
         size = random.randint(2, max_size)
         g = SimpleGraph(size)
         g.connect_random(random.random())
         return g
 
     @staticmethod
-    def get_random_connected_graph(max_size=20):
-        """Losowy graf spojny"""
+    def get_random_connected_graph(max_size=20) -> SimpleGraph:
         g = GraphBuilder.get_random_graph(max_size)
         while not g.is_connected_graph():
             g = GraphBuilder.get_random_graph(max_size)
         return g
 
     @staticmethod
-    def get_random_weighted_graph(max_size=20):
-        """Losowy graf"""
+    def get_random_weighted_graph(max_size=20) -> SimpleGraph:
         g = GraphBuilder.get_random_graph(max_size)
         g.assign_random_weights()
         return g
 
     @staticmethod
-    def get_random_weighted_connected_graph(max_size=20):
-        """Losowy graf"""
+    def get_random_weighted_connected_graph(max_size=20) -> SimpleGraph:
         g = GraphBuilder.get_random_connected_graph(max_size)
         g.assign_random_weights()
         return g
 
     @staticmethod
-    def get_random_flow_network(N):
+    def get_random_digraph(max_size=20) -> DirectedGraph:
+        size = random.randint(2, max_size)
+        g = DirectedGraph(size)
+        g.connect_random(random.random())
+        return g
+
+    @staticmethod
+    def get_random_flow_network(N: int) -> DirectedGraph:
         """
         Losowa sieć przepływu
         N - liczba warstw sieci
@@ -123,4 +128,17 @@ class GraphBuilder:
         # krok 4: przypisanie każdej krawędzi losowej przepustowości
         g.assign_random_weights()
 
+        return g
+
+    @staticmethod
+    def get_random_2D_graph(
+        size=20, x_min=-50, x_max=50, y_min=-50, y_max=50
+    ) -> SimpleGraph:
+        filename = f"{size}_coordinates.tmp"
+        with open(filename, "w") as f:
+            for _ in range(size):
+                x = random.randint(x_min, x_max)
+                y = random.randint(y_min, y_max)
+                f.write(f"{x} {y}\n")
+        g = SimpleGraph().from_coordinates(filename)
         return g

@@ -3,16 +3,19 @@ import copy
 import collections
 import math
 import random
+import numpy as np
 from typing import List, Tuple, Dict
+import matplotlib.pyplot as plt
 
-from spacja.functions import get_trail_to_node
+
+from spacja.functions import get_trail_to_node, stopwatch
 from spacja.graph import Graph
 from spacja.simple_graph import SimpleGraph
 from spacja.directed_graph import DirectedGraph
 from spacja.helper_structures import Matrix, Node
 
 
-def find_eulerian_trail(g) -> List[Node]:
+def find_eulerian_trail(g: SimpleGraph) -> List[Node]:
     """Znajduje losowy cykl Eulera w grafie"""
     if not g.is_eulerian():
         raise ValueError(f"Nie jest to graf Eulerowski\n{g}")
@@ -31,7 +34,7 @@ def find_eulerian_trail(g) -> List[Node]:
     return solution
 
 
-def find_hamiltonian_circuit(g) -> List[Node]:
+def find_hamiltonian_circuit(g: SimpleGraph) -> List[Node]:
     """Znajduje losowy cykl Hamiltona w grafie"""
     g = copy.deepcopy(g)
     if not g.is_connected_graph():
@@ -41,7 +44,7 @@ def find_hamiltonian_circuit(g) -> List[Node]:
     return solution
 
 
-def hamilton_search_r(g, stack) -> List[Node]:
+def hamilton_search_r(g: SimpleGraph, stack: List[Node]) -> List[Node]:
     # Zawiera wszystkie wierzcholki
     if set(stack) == g.nodes:
         # Istnieje połączenie między pierwszym a ostatnim
@@ -62,13 +65,12 @@ def hamilton_search_r(g, stack) -> List[Node]:
 
 def find_shortest_path_dijkstra(
     g: SimpleGraph, source: Node
-) -> Tuple[Dict[Node, int], Dict[Node, Node]]:
+) -> Tuple[Dict[int, float], Dict[int, int]]:
     """ Przyjmuje graf i zrodlo (wierzcholek).
         Zwraca:
         - slownik odleglosci od zrodla
         - slownik poprzednikow
     """
-
     predecessors = {}
     distance = {}
     # kolejka priorytetowa dla wierzchołkow grafu (klucz: aktualnie wyliczona odleglosc)
@@ -161,7 +163,7 @@ def find_shortest_path_bellman_ford(
         predecessors[node] = None
     distance[source] = 0
 
-    for i in range(1, len(g)):
+    for _ in range(1, len(g)):
         for edge in g.edges:
             u = edge.begin
             v = edge.end
@@ -188,7 +190,6 @@ def find_shortest_path_bellman_ford(
 
 
 def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
-
     # dodaj wierzchołek s na potrzeby algorytmu
     g_p = copy.deepcopy(g)
     g_p.add_nodes()
@@ -197,14 +198,14 @@ def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
         g_p.connect(s, node, weight=0)
 
     # sprawdź, czy nie ma cyklów o ujemnej sumie wag
-    d, p = find_shortest_path_bellman_ford(g_p, s)
+    d, _ = find_shortest_path_bellman_ford(g_p, s)
 
     h = {}
     from pprint import pprint
 
     for v in g_p.nodes:
         h[v] = d[v]
-    w = set()
+
     for edge in g_p.edges:
         edge.weight = edge.weight + h[edge.begin] - h[edge.end]
 
@@ -218,7 +219,7 @@ def johnson_get_distances_to_nodes_matrix(g: Graph) -> Matrix:
 
 def breadth_first_search(
     g: Graph, source: Node, target: Node = None
-) -> Dict[Node, Node]:
+) -> Dict[int, None]:
     """Przeszukiwanie wszerz. Na podstawie alg_5.pdf"""
     # tablica odległości
     d = {n: math.inf for n in g.nodes}
@@ -241,7 +242,9 @@ def breadth_first_search(
     return p
 
 
-def ford_fulkerson(g: DirectedGraph, verbose: bool = False):
+def ford_fulkerson(
+    g: DirectedGraph, verbose: bool = False
+) -> Dict[Tuple[int, int], int]:
     """Edmonds–Karp implementation"""
     # sieć rezydualna
     gf = copy.deepcopy(g)
@@ -286,3 +289,131 @@ def ford_fulkerson(g: DirectedGraph, verbose: bool = False):
                 gf.connect(v, u, w2)
         step += 1
     return f
+
+
+def page_rank(g: DirectedGraph, d=0.15, algorithm="matrix") -> Dict[int, float]:
+    """
+    Zwraca ranking węzłów w grafie skierowanym
+    d - prawdopodobieństwo teleportacji
+    """
+    if d < 0 or d > 1:
+        raise ValueError("Nieprawidłowa wartość dla prawdopodobieństwa")
+
+    if g.has_dangling_nodes():
+        raise ValueError(
+            "Nieprawidłowy graf: posiada wierzchołki bez krawędzi wyjściowych."
+        )
+
+    if algorithm == "random_walk":
+        return _page_rank_random_walk(g, d=d)
+    elif algorithm == "matrix":
+        return _page_rank_matrix(g, d=d)
+    else:
+        raise ValueError("Nieprawidłowy wybór algorytmu.")
+
+
+def _page_rank_random_walk(g: DirectedGraph, d) -> Dict[int, float]:
+    adj_l = g.to_adjacency_list()
+    visited = {n: 0 for n in g.nodes}
+    current_node = random.choice(list(g.nodes))
+    N = 0
+    while N < 100000:
+        if random.random() > d and len(adj_l[current_node]) != 0:
+            current_node = random.choice(list(adj_l[current_node]))
+        else:
+            current_node = random.choice(list(g.nodes))
+
+        visited[current_node] += 1
+        N += 1
+    return {n: v / sum(visited.values()) for n, v in visited.items()}
+
+
+def _page_rank_matrix(g: DirectedGraph, d) -> Dict[int, float]:
+    n = len(g.nodes)
+    P = np.zeros((n, n))
+    A = np.array(g.to_adjacency_matrix())
+    for i in range(n):
+        for j in range(n):
+            P[i][j] = (1.0 - d) * A[i][j] / g.node_degree(i + 1) + d / float(n)
+
+    p0 = np.full(n, 1 / n)
+    p1 = np.zeros(n)
+    i = 0
+    err = float("inf")
+    while err > 1e-11:
+        p1 = p0.dot(P)
+        diff = p1 - p0
+        err = sum(x ** 2 for x in diff)
+        p0 = p1
+        i += 1
+
+    print(f"Zbieżność uzyskano po {i} iteracjach.")
+    return {k: p1[k - 1] for k in range(1, n + 1)}
+
+
+@stopwatch
+def simulated_annealing(g: SimpleGraph, MAX_IT=None, P: List[int] = None, save=False):
+    if not g.is_complete():
+        return ValueError("Do tego algorytmu graf musi być pełny.")
+
+    if P is None:
+        P = [n for n in range(1, len(g) + 1)]
+        random.shuffle(P)
+
+    if MAX_IT is None:
+        MAX_IT = len(g)
+
+    adj_m = g.to_adjacency_matrix()
+    d = circuit_length(adj_m, P)
+    for i in range(50, 0, -1):
+        T = 0.001 * i ** 2
+        for _ in range(MAX_IT):
+            # switch: a-b c-d --> a-c b-d
+            _, b, c, _ = _choose_nodes(P)
+            P[b], P[c] = P[c], P[b]
+
+            d_new = circuit_length(adj_m, P)
+            if d_new < d:
+                d = d_new
+            else:
+                r = random.random()
+                if r < math.exp(-(d_new - d) / T):
+                    d = d_new
+                else:
+                    # switch back
+                    P[b], P[c] = P[c], P[b]
+
+    if save:
+        x = [g.x[n - 1] for n in P]
+        y = [g.y[n - 1] for n in P]
+
+        # connect first and last point
+        x.append(g.x[P[0] - 1])
+        y.append(g.y[P[0] - 1])
+
+        plt.plot(x, y, "-o")
+        plt.title(f"MAX_IT={MAX_IT}, d={d:.3f}")
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.savefig("SA.png")
+        plt.clf()
+
+    return P
+
+
+def _choose_nodes(P: List[int]) -> Tuple[int, int, int, int]:
+    while True:
+        a = random.randrange(len(P))
+        b = (a - 1) % len(P) if random.getrandbits(1) else (a + 1) % len(P)
+        c = random.randrange(len(P))
+        d = (c - 1) % len(P) if random.getrandbits(1) else (c + 1) % len(P)
+        nodes = [P[a], P[b], P[c], P[d]]
+        if len(set(nodes)) == len(nodes):
+            return a, b, c, d
+
+
+def circuit_length(adj_m, P: List[int]) -> float:
+    length = 0.0
+    for i in range(len(P)):
+        length += adj_m[P[i] - 1][P[(i + 1) % len(P)] - 1]
+    return length

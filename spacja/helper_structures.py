@@ -1,10 +1,13 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, List, Dict, Set
 
 
 Weight = int
 Matrix = List[List[int]]
 Node = int
+AdjacencyList = Dict[int, Set[int]]
+AdjacencyMatrix = List[List[int]]
+IncidenceMatrix = List[List[int]]
 
 
 @dataclass

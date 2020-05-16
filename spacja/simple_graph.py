@@ -3,10 +3,10 @@ from __future__ import annotations
 import os
 import random
 import itertools
-from typing import Set
+from typing import Set, Dict, List
 
-from spacja.graph import (
-    Graph,
+from spacja.graph import Graph
+from spacja.helper_structures import (
     Node,
     Edge,
     Weight,
@@ -17,7 +17,7 @@ from spacja.graph import (
 
 
 class SimpleGraph(Graph):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.separator = "--"
         self.name = "graph"
@@ -60,6 +60,10 @@ class SimpleGraph(Graph):
         return node2 in [
             edge.end for edge in self.get_all_possible_edges() if edge.begin == node1
         ]
+
+    def is_complete(self) -> bool:
+        n = len(self.nodes)
+        return len(self.edges) == (n * (n - 1) / 2)
 
     def to_adjacency_matrix(self) -> AdjacencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
@@ -119,6 +123,37 @@ class SimpleGraph(Graph):
             self.connect(edge_nodes[0] + 1, edge_nodes[1] + 1, weight=weight)
         return self
 
+    def from_coordinates(self, filename):
+        self.clear()
+        with open(filename) as f:
+            content = f.readlines()
+
+        self.x = []
+        self.y = []
+        for line in content:
+            self.x.append(int(line.split()[0]))
+            self.y.append(int(line.split()[1]))
+
+        size = len(content)
+        self.add_nodes(size)
+        self.fill()
+
+        # weights
+        for edge in self.edges:
+            x1 = self.x[edge.begin - 1]
+            x2 = self.x[edge.end - 1]
+            y1 = self.y[edge.begin - 1]
+            y2 = self.y[edge.end - 1]
+            edge.weight = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+
+        return self
+
+    def fill(self):
+        nodes = list(self.nodes)
+        for n1 in nodes:
+            for n2 in nodes[n1:]:
+                self.connect(n1, n2)
+
     def components(self) -> Dict[int, int]:
         """Zwraca słownik złożony z wierzchołków i spójnych składowych do których należą"""
         g = self.to_adjacency_list()
@@ -132,20 +167,7 @@ class SimpleGraph(Graph):
                 self.components_r(nr, v, comp, g)
         return comp
 
-    def component_list(self) -> Dict[int, List[int]]:
-        """Zwraca słownik złożony ze spoójnych składowych i listy wierzchołków które do nich należą."""
-        comp = self.components()
-        components = {}
-        for v, c in comp.items():
-            if c in components:
-                components[c].append(v)
-            else:
-                components[c] = [v]
-        for v in components.values():
-            v.sort()
-        return components
-
-    def connect_random(self, p: int):
+    def connect_random(self, p: float) -> None:
         """
         Łączy wierzchołki tak, aby prawdopodobieństwo istnienia krawędzi
         między dowolnymi dwoma wierzchołkami wynosiło p

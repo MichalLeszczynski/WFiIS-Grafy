@@ -56,11 +56,12 @@ def stopwatch(fun):
     @functools.wraps(fun)
     def wrapper(*args, **kwargs):
         start = time.monotonic()
-        result =  fun(*args, **kwargs)
+        result = fun(*args, **kwargs)
         end = time.monotonic()
         debug_info = f"{fun.__name__} took {(end - start)*1000:.3f}ms"
         print(debug_info)
         return result
+
     return wrapper
 
 

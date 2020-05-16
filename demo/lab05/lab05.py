@@ -74,8 +74,8 @@ def main():
     if sys.argv[1] == "gen":
         save_dir = sys.argv[2]
 
-        if save_dir == 'example':
-            print(f'Używanie sieci przykładowej (z input_5.pdf)')
+        if save_dir == "example":
+            print(f"Używanie sieci przykładowej (z input_5.pdf)")
             g = get_example()
         else:
             N = int(sys.argv[3])

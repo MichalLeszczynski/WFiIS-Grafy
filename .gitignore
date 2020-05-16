@@ -130,11 +130,13 @@ dmypy.json
 
 # IDE's
 .vscode/
+.idea
 
 # Output files
 *.png
 *.g
 *.gv
 *.al
-
-.idea
+*.am
+*.im
+*.tmp

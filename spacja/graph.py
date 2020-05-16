@@ -17,8 +17,9 @@ from spacja.helper_structures import (
     IncidenceMatrix,
 )
 
+
 class Graph(ABC):
-    def __init__(self, size: int=0) -> None:
+    def __init__(self, size: int = 0) -> None:
         self.nodes: Set[Node] = set()
         self.edges: Set[Edge] = set()
         self.separator = ""
@@ -27,7 +28,7 @@ class Graph(ABC):
         self.clear()
         self.add_nodes(count=size)
 
-    def add_nodes(self, count: int=1) -> None:
+    def add_nodes(self, count: int = 1) -> None:
         """Tworzy nowe wierzchołki"""
         for i in range(len(self) + 1, len(self) + 1 + count):
             self.nodes.add(i)
@@ -226,7 +227,7 @@ class Graph(ABC):
             )
             filename += ".gv"
             os.system(f"dot -T png -K {engine} -O {filename}")
-            # os.system(f"rm {filename}")
+            os.system(f"rm {filename}")
 
     def load(self, filename: str) -> None:
         """Wczytaj graf z pliku w formacie .al, .am lub .im"""
@@ -319,9 +320,8 @@ class Graph(ABC):
     def randomize(self, n_switches: int) -> None:
         """Losowo zamienia krawędzie: a-b c-d -> a-d b-c"""
         while n_switches > 0:
-            r1 = random.choice(tuple(self.edges))
+            r1, r2 = random.choices(tuple(self.edges), k=2)
             a, b = r1.begin, r1.end
-            r2 = random.choice(tuple(self.edges))
             c, d = r2.begin, r2.end
             if a == d or b == c:
                 continue

@@ -61,6 +61,10 @@ class SimpleGraph(Graph):
             edge.end for edge in self.get_all_possible_edges() if edge.begin == node1
         ]
 
+    def is_complete(self) -> bool:
+        n = len(self.nodes)
+        return len(self.edges) == (n * (n - 1) / 2)
+
     def to_adjacency_matrix(self) -> AdjacencyMatrix:
         """Zwraca graf w postaci macierzy sąsiedztwa"""
         adj_m = [[0 for _ in range(len(self))] for _ in range(len(self))]
@@ -118,6 +122,37 @@ class SimpleGraph(Graph):
             # mapowanie numerów wierzchołków: n-1 -> n
             self.connect(edge_nodes[0] + 1, edge_nodes[1] + 1, weight=weight)
         return self
+
+    def from_coordinates(self, filename):
+        self.clear()
+        with open(filename) as f:
+            content = f.readlines()
+
+        self.x = []
+        self.y = []
+        for line in content:
+            self.x.append(int(line.split()[0]))
+            self.y.append(int(line.split()[1]))
+
+        size = len(content)
+        self.add_nodes(size)
+        self.fill()
+
+        # weights
+        for edge in self.edges:
+            x1 = self.x[edge.begin - 1]
+            x2 = self.x[edge.end - 1]
+            y1 = self.y[edge.begin - 1]
+            y2 = self.y[edge.end - 1]
+            edge.weight = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+
+        return self
+
+    def fill(self):
+        nodes = list(self.nodes)
+        for n1 in nodes:
+            for n2 in nodes[n1:]:
+                self.connect(n1, n2)
 
     def components(self) -> Dict[int, int]:
         """Zwraca słownik złożony z wierzchołków i spójnych składowych do których należą"""

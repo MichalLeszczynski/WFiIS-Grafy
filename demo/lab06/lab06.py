@@ -85,7 +85,7 @@ def example04():
 def example05():
     g = SimpleGraph().from_coordinates("input.dat")
     P = None
-    for MAX_IT in range(10, 201, 5):
+    for MAX_IT in range(10, 150, 5):
         P = simulated_annealing(g, MAX_IT, save=True, P=P)
         length = circuit_length(g.to_adjacency_matrix(), P)
         with open("P_5.tmp", "a") as f:
@@ -105,9 +105,10 @@ def example06():
 def example07():
     g = SimpleGraph().from_coordinates("input.dat")
     P = None
-    for _ in range(250):
-        P = simulated_annealing(g, MAX_IT=20, save=True, P=P)
+    for _ in range(100):
+        P = simulated_annealing(g, MAX_IT=100, save=True, P=P)
         length = circuit_length(g.to_adjacency_matrix(), P)
+        print(length)
         with open("P.dat", "a") as f:
             f.write(f"{length:.3f}, {P}\n")
 
@@ -121,18 +122,8 @@ if __name__ == "__main__":
     adjacency_list_1 = alpha_to_adjacency_list(alpha_list_1)
     adjacency_list_2 = alpha_to_adjacency_list(alpha_list_2)
 
-    examples = [
-        None,
-        example01,
-        example02,
-        example03,
-        example04,
-        example05,
-        example06,
-        example07,
-    ]
     if len(sys.argv) == 2:
-        example = int(sys.argv[1])
-        examples[example]()
+        fun = f"example0{sys.argv[1]}"
+        globals()[fun]()
     else:
         print("Nieprawidłowa liczba argumentów:\n./lab06 <numer przykładu>")

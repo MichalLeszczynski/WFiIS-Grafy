@@ -351,7 +351,6 @@ def _page_rank_matrix(g: DirectedGraph, d) -> Dict[int, float]:
     return {k: p1[k - 1] for k in range(1, n + 1)}
 
 
-@stopwatch
 def simulated_annealing(g: SimpleGraph, MAX_IT=None, P: List[int] = None, save=False):
     if not g.is_complete():
         return ValueError("Do tego algorytmu graf musi być pełny.")
@@ -365,7 +364,7 @@ def simulated_annealing(g: SimpleGraph, MAX_IT=None, P: List[int] = None, save=F
 
     adj_m = g.to_adjacency_matrix()
     d = circuit_length(adj_m, P)
-    for i in range(50, 0, -1):
+    for i in range(100, 0, -1):
         T = 0.001 * i ** 2
         for _ in range(MAX_IT):
             # switch: a-b c-d --> a-c b-d

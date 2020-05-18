@@ -82,9 +82,8 @@ def example06():
 
 
 if __name__ == "__main__":
-    examples = [None, example01, example02, example03, example04, example05, example06]
     if len(sys.argv) == 2:
-        example = int(sys.argv[1])
-        examples[example]()
+        fun = f"example0{sys.argv[1]}"
+        globals()[fun]()
     else:
         print("Nieprawidłowa liczba argumentów:\n./lab02 <numer przykładu>")
